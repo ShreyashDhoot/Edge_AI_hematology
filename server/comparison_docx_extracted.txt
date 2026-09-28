@@ -1,0 +1,218 @@
+Comparison Metrics for the Blood Cell Counting System
+Working notes: what to measure, why, and how to compute it from what we already have
+This note walks through the three questions raised about the accuracy/comparison table, plus a quick read on the six next-step items. The short version: the comparison doc your teammate pulled together mixes two genuinely different kinds of metric — classification accuracy (ours) and coefficient of variation / CV% (manual and machine methods) — and the fix isn’t to force them into one column, it’s to report both kinds for our system too, because that's what the advisor is actually asking for when they bring up 'no gold standard.'
+1. The metric in the comparison doc, and how to get the same one from our system
+What CV% actually is
+Every non-‘our system’ row in that table (manual, high-end analyzer, low-end analyzer) is reported as CV% — coefficient of variation. This is not accuracy. It doesn't ask “how close is this count to the true count?” It asks “if I count the same specimen repeatedly, how much do my answers wobble?” That's a precision / repeatability metric, not a correctness metric. It's entirely possible for a method to have excellent (low) CV% while being consistently wrong — precise but biased. This is exactly why the doc's own note about not forcing everything into one column is correct: our 92–95% is a correctness number against labelled ground truth; CV% is a spread number with no ground truth involved at all.
+CV% = (σ / μ) × 100
+where μ is the mean count across repeated measurements of the same specimen and σ is the standard deviation of those repeated counts. It is always computed per cell type (RBC, WBC, platelets separately), because each has a different baseline variance.
+Why manual/machine CV% and our accuracy aren't swappable
+CV% needs repeated measurements of the same specimen. Accuracy needs one measurement compared against a known label.
+A hemocytometer operator recounts the same chamber, or the same blood draw is run through the Sysmex analyzer 10–20 times — that's where the manual/machine CV% numbers in the doc come from.
+Our 92–95% is single-pass agreement with human-drawn bounding-box labels on the BCCD training/test images — a completely different experiment design.
+So the honest thing to do is not to convert one into the other (you can't — they measure different properties) but to additionally compute CV% for our system, so the table has a real precision column for every method, ours included.
+How to compute CV% for our system
+The trick is that a deep learning model is deterministic on a fixed input — feed the exact same image through SSDLite twice and you'll get the exact same bounding boxes and count, so a CV% computed by re-running inference on one static image will always read 0%, and reviewers will (rightly) call that meaningless. To get a real CV%, the variability has to come from re-imaging, the way a real analyzer's variability comes from re-drawing the sample through its fluidics. Two protocols, both worth running:
+Protocol A — field-to-field CV (what the doc's numbers actually measure)
+Take one blood smear / slide.
+Capture 10–20 different microscope fields from that same slide (move the stage / re-position, same way a technician scans different fields).
+Run the full pipeline (detection + counting) on each field image.
+You now have a vector of 10–20 RBC counts, 10–20 WBC counts, 10–20 platelet counts from the same specimen.
+Compute mean, SD, and CV% per cell type from that vector.
+This is directly comparable to the manual and machine CV% numbers in the table, since those also reflect field-to-field / draw-to-draw variation, not just measurement noise.
+Protocol B — pure algorithmic reproducibility (a secondary, narrower claim)
+Take one single image.
+Re-run inference on it 10–20 times, introducing only the kind of perturbation a re-capture would realistically introduce — small rotation (±2–3°), slight brightness/contrast jitter, ±2–3 px crop shift — rather than feeding the identical tensor in each time.
+Compute CV% on the resulting counts.
+Label this one clearly as algorithmic/model reproducibility under simulated re-imaging, not specimen-level CV%, so it isn't mistaken for the same quantity as Protocol A or the machine numbers. Reviewers who know this space will ask which one you mean, so naming both explicitly heads that off.
+2. The metric you're half-remembering: method-comparison / agreement statistics
+Why there's ‘no gold standard’
+Your advisor's objection is a real and well-known one in clinical lab science, not just a hurdle for a student project. When a new hematology method is validated, it is compared against an existing method (often the current lab instrument, sometimes manual counts) — never against “truth,” because there is no independent truth available outside a research-grade reference method few labs have access to. Even Sysmex/Beckman Coulter analyzers were themselves originally validated this way, against manual counts, which is the same caveat your teammate's doc already flags at the bottom (“automated systems are usually validated against manual/expert counts as the reference… that reference has its own error built in”). That's precisely the situation you're in with the BCCD/biomed-student labels: your ground truth is itself a fallible human method with its own error rate, not an oracle.
+Because you can't say “method X is 95% correct” without a true reference, the field uses agreement statistics instead — they describe how well two methods track each other without assuming either one is right. The two workhorse tools are:
+Bland-Altman analysis
+For each specimen/image, you have two counts — e.g., your system's count and the biomed student's manual count for the same image. Bland-Altman plots the difference between the two methods (y-axis) against their mean (x-axis) for every paired observation, then reports two numbers:
+Bias
+ — the mean of all the (system − manual) differences. Tells you if your system systematically over- or under-counts relative to manual counting.
+95% limits of agreement (LoA)
+ — bias ± 1.96 × SD(differences). Tells you the range within which 95% of individual disagreements between the two methods fall. This is the number that answers “how far off can any single reading be?” — it's the closest thing you have to the table's CV% concept, but for two-method agreement rather than one method's repeatability.
+bias = mean(system_count − manual_count)
+LoA = bias ± 1.96 × SD(system_count − manual_count)
+Intraclass Correlation Coefficient (ICC)
+Pearson correlation is a common but weaker substitute here — it only asks whether two sets of numbers move together, not whether they agree in absolute value (a method that's always exactly double the other still gets r = 1.0). ICC (specifically the two-way random-effects, absolute-agreement form, ICC(2,1)) corrects for that: it penalizes both poor correlation and systematic offset, giving a single 0–1 score for genuine agreement between raters/methods measuring the same items. It's standard in exactly this kind of “two counting methods, no gold standard” comparison.
+How to compute this for our system
+Take a set of images where you have both a system count and a human (biomed student) count — the 72 labelled images are exactly this pairing (see Part 3).
+For each image, record (system_count, manual_count) per cell type.
+Compute bias and 95% LoA per cell type; plot the Bland-Altman chart (easy in Python — matplotlib, or the statsmodels graphics.mean_diff_plot helper).
+Optionally compute ICC(2,1) per cell type using pingouin.intraclass_corr in Python.
+This gives you a defensible answer to “how do you compare to lab methods when your dataset is different” — you're not claiming your labels are truth, you're reporting agreement with a human reference the same way every real analyzer validation paper does, and you can say so explicitly in the paper.
+3. What to do with the 72 biomed-student-labelled images
+Treat this set as a small, independent, out-of-distribution validation set — not as training data, and not as “more of the same” as BCCD. Concretely:
+Held-out generalization check.
+ Run the trained model on these 72 images (never seen during training) and report accuracy / precision / recall / F1 / confusion matrix per class, alongside the same metrics on the BCCD test split. The gap between the two is your real evidence for the “accuracy usually drops on our own captured images” line already in your teammate's doc — right now that's a prediction; this makes it a measured number.
+Paired data for the agreement analysis in Part 2.
+ Since these images have both a human label and a model prediction, they're the direct input for the Bland-Altman/ICC calculation — you don't need a separate data collection step to get that analysis started.
+Flag the single-annotator limitation, and fix a subset of it.
+ Right now every one of the 72 labels comes from one biomed student, so you have no way to know how much of any disagreement is “model error” versus “this particular annotator's judgment call” — especially for platelets, which even trained lab techs disagree on 10–25% of the time per your teammate's own table. Get a second person (the same student re-labelling blind after a gap, or a second biomed student) to independently re-label 15–20 of the 72, and report inter-annotator agreement (Cohen's kappa for per-cell classification, or the same Bland-Altman/ICC treatment for counts). This directly strengthens the ‘no true gold standard’ argument in your paper — you can show, not just assert, that even the human reference has spread.
+Not a training set.
+ 72 images is too small and too narrow (single unlabelled-source-then-labelled) to fine-tune on without high overfitting risk. It's fine as a threshold-tuning set (e.g. picking the confidence cutoff for detections) or a small calibration set, but keep it out of the training loop — its value is as an independent check.
+Note the sample-size caveat.
+ With ~72 images, per-class counts (especially platelets, which are sparse and small) will be low enough that a single accuracy number has real uncertainty around it. Report a confidence interval (a Wilson score interval is the standard choice for a proportion like accuracy on a small n) rather than a bare percentage, so the number isn't read as more precise than it is.
+4. Quick take on the six next steps
+All six are reasonable directions and worth keeping. A few notes and additions against each:
+1. Quantize the model (2–3 levels), re-measure accuracy/precision/recall/comparison metric
+Good — add the CV%/Bland-Altman numbers from Parts 1–2 at each quantization level too, not just accuracy. A precision-vs-speed-vs-compression trade-off table (FP32 vs INT8 vs whatever the third level is) is a strong, self-contained results section on its own.
+Run the timing/accuracy numbers on the actual Raspberry Pi, not just a dev machine — quantization's main payoff is edge latency/memory, so the headline numbers should come from the target hardware.
+2. Own blood samples, biomed-labelled, own dataset
+Good — also gives you a real second reference: have the biomed student do (or supervise) a manual hemocytometer count on the same samples, so you get a true Bland-Altman comparison against a manual method, not just against BCCD-style labels.
+Worth flagging early with your advisor: handling and imaging your own blood, even self-drawn, usually needs a biosafety/ethics sign-off at the department level for a student project. Better to raise it now than discover it during evaluation.
+3. Confidence score + consistency of confidence
+This is calibration in the standard ML sense — the formal metric is Expected Calibration Error (ECE), usually shown alongside a reliability diagram (predicted confidence vs actual accuracy, bucketed). That's the citable name for exactly the idea you described.
+4. Annotated PDF output with confidence, for explainability
+Good feature for a demo and for the paper's explainability angle. Consider formatting it like an abbreviated CBC report (per-class counts, flags, confidence) — it reads as closer to a real clinical deliverable and makes a nice figure.
+5. Obscure/recolor images to imitate dyes
+Good robustness test. Frame it as a robustness curve — accuracy plotted against corruption severity (mild/moderate/severe blur, stain-color shift, obscuration) — rather than a single before/after number. This mirrors the standard ImageNet-C style robustness benchmark and is easy to justify to examiners as a recognized methodology, not an ad hoc test.
+6. Other things worth adding
+mAP (mean Average Precision at IoU 0.5, and 0.5:0.95) — SSDLite is an object detector, and mAP is the standard detection metric; “accuracy” alone under-represents what a detector is actually being judged on (localization, not just presence).
+A confusion matrix per class for the detection stage, not just an aggregate accuracy number — this is what will show whether platelets specifically are the weak point, which your own literature review already predicts.
+Report accuracy/CV%/agreement numbers with confidence intervals given the small test sets involved (Wilson interval for proportions, bootstrap CI for CV% and Bland-Altman bias/LoA) — reviewers on a hematology-adjacent panel are likely to ask for this.
+If time allows, a small ablation comparing SSDLite against a YOLO variant, since the paper's literature review and methodology both mention YOLO as an alternative but the results section currently only reports SSDLite/EfficientNet/MobileNetV2 — either add the comparison or narrow the methodology text to match what was actually run.
+Report power draw / inference time per image on the Pi 4 itself alongside the quantization results — ties directly into the ‘resource-limited settings’ framing in your abstract.
+5. Accuracy / agreement numbers for real lab analyzers, with sources
+One thing to flag before the numbers: almost none of these published evaluations report a single ‘accuracy %’ the way our classification model does. The field's actual convention is exactly the method-comparison approach from Part 2 — correlation coefficient (r or R²) against a reference method, regression slope/intercept, and Bland-Altman bias ± 95% limits of agreement. A couple of papers use the word ‘accuracy’ in prose (e.g. “accuracy was excellent… compared with state of the art”) without attaching a number to it. That's not a gap in this search — it's the same ‘no gold standard’ point your advisor raised, showing up directly in how the industry itself reports performance. Worth saying explicitly in the paper rather than papering over it with an invented percentage.
+High-end / 5-part analyzers (Sysmex XN/XR-series, Beckman Coulter DxH 900)
+Analyzer
+Compared against
+Reported numbers
+Source
+Sysmex XN-1000
+Atellica HEMA 580 (CLSI EP09c method comparison, n=100)
+r = 0.999 (RBC), 0.998 (HGB), 0.996 (WBC), 0.995 (PLT-I)
+[1]
+Sysmex XR-series
+Established Sysmex XN reference system
+r = 0.998 (RBC), 1.000 (WBC), 1.000 (PLT), 0.999 (HGB); Bland-Altman bias ≈ 0 except PLT (−1.6, LoA −11.8 to 8.6)
+[2]
+Beckman Coulter DxH 900
+Manual 400-cell microscopic differential (n=100)
+R ≥ 0.88 for leukocyte differential, all parameters except basophils; flag sensitivity >90%
+[3]
+Beckman Coulter DxH 900
+Sysmex XN20 (reference: manual microscopy for abnormal-cell flags)
+“Excellent degree of association” for leukocyte differential; IG% bias 1.2% (95% CI 0.9–1.5), r = 0.90
+[4]
+Dymind DH76 (mid/5-part)
+Sysmex XN-1000
+R² = 1.000 (WBC), 0.999 (RBC), 0.999 (HGB), 0.994 (PLT >50×10⁹/L), 0.910 (PLT <50×10⁹/L)
+[5]
+Low-end / 3-part and point-of-care analyzers
+Analyzer
+Compared against
+Reported numbers
+Source
+Sysmex XQ-320 (3-part)
+Sysmex XN-9000, used as in-lab gold standard (n=493)
+r > 0.94 for most of 20 parameters; weaker for MXD# (0.891), MXD% (0.898), MCHC (0.849)
+[6]
+ERBA ELite 580 (budget 5-part)
+Beckman Coulter LH 780
+R² > 0.90 for most CBC/differential parameters, except MCHC (0.35) and basophils
+[7]
+HemoScreen (point-of-care, microfluidic)
+Sysmex XN (multi-site)
+Bland-Altman bias & 95% LoA reported per parameter; agreement good overall but LoA noticeably wider than the high-end-vs-high-end comparisons above
+[8]
+Cito POC CBC (microfluidic, CLIA-waived / non-lab settings)
+In-laboratory reference hematology analyzer (n=551)
+Mean % bias <2% for WBC, RBC, PLT, HGB, HCT; larger bias for monocytes (+25.9%), basophils (−15%); overall abnormal-flag agreement 93.3%
+[9]
+QBC Autoread Plus (basic point-of-care)
+Trained laboratory staff, same device, operated by non-medical staff
+r = 0.91 (Hct), 0.96 (WBC), 0.92 (Plt); Bland-Altman bias 0.5% (Hct), 0.1×10⁹/L (WBC), 10×10⁹/L (Plt)
+[10]
+Mindray BC-5180 (budget 5-part)
+Sysmex XN-1000
+Passing-Bablok regression + Pearson correlation reported; strong agreement, consistent with the mid-tier analyzers above
+[11]
+How to use this in the comparison table
+Don't collapse these into a single ‘accuracy %’ column to match our 92–95% — that would misrepresent what these papers actually measured. Add them as their own columns (correlation r / R² vs. reference, and Bland-Altman bias ± LoA where available), the same way the CV% column already sits separately from ours.
+The pattern across all of these is consistent and worth stating plainly in the paper: r typically exceeds 0.98–0.99 for RBC/WBC/HGB on high-end analyzers, drops into the 0.85–0.95 range for platelets and minor WBC subtypes even on high-end systems, and widens further (wider Bland-Altman LoA, more scatter) as you move down to 3-part and point-of-care devices — exactly mirroring the CV% pattern already in your teammate's table (platelets are the hardest to measure reliably at every tier, including the expensive ones).
+Our system's 92–95% classification accuracy and these r / R² values are still not directly interchangeable numbers (one is agreement-with-labels accuracy, the other is method-comparison correlation) — but computing our own Bland-Altman/ICC against the biomed student's manual counts (Part 2) will put our results in the same statistical language as this entire table, which is what makes the comparison legitimate rather than apples-to-oranges.
+References for this section
+[1] Evaluation of the New Beckman Coulter Analyzer DxH 900 Compared to Sysmex XN20: Analytical Performance and Flagging Efficiency. Int J Lab Hematol / PMC. https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8535162/
+[2] Performance evaluation of the new Sysmex XR-Series haematology analyser. ScienceDirect (Practical Laboratory Medicine). https://www.sciencedirect.com/science/article/pii/S2352551724000167
+[3] Performance evaluation of the new hematology analyzer UniCel DxH 900. PubMed. https://pubmed.ncbi.nlm.nih.gov/33389827/
+[4] Evaluation of the New Beckmann Coulter Analyzer DxH 900 Compared to Sysmex XN20: Analytical Performance and Flagging Efficiency (IG% Bland-Altman detail). PMC. https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8535162/
+[5] Evaluation of automated hematology analyzer DYMIND DH76 compared to SYSMEX XN 1000 system. PMC. https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8451233/
+[6] Evaluation of the Sysmex XQ-320 three-part differential haematology analyser and its flagging capabilities. PMC. https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10943257/
+[7] Performance Evaluation of Fully Automated 5-Part Differential Hematology Analyzer ELite 580 (ERBA). PMC. https://pmc.ncbi.nlm.nih.gov/articles/PMC8804059/
+[8] Clinical Evaluation of a Novel Point-of-Care Hematology Analyzer for Complete Blood Count With Differential. Int J Lab Hematol, 2026 (HemoScreen vs Sysmex XN). https://onlinelibrary.wiley.com/doi/10.1111/ijlh.70032
+[9] Analytical performance of a point-of-care CBC hematology analyzer, including a 5-part differential: a prospective study to evaluate a microfluidic flow cytometry-based analyzer in waived settings. American Journal of Clinical Pathology. https://doi.org/10.1093/ajcp/aqae149
+[10] The accuracy of a point-of-care test among different operators using the QBC Autoread Plus Analyzer for the measurement of a basic full blood count. PubMed. https://pubmed.ncbi.nlm.nih.gov/31865958/
+[11] Analytical comparison between two hematological analyzer systems: Mindray BC-5180 vs Sysmex XN-1000. PMC. https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6805265/
+6. Computing the same numbers for our system
+Every paper in Section 5 follows roughly the same recipe: a paired dataset (new method vs. a reference), a correlation coefficient, a method-comparison regression (not plain OLS), and a Bland-Altman bias/LoA — usually under the umbrella of one formal protocol, CLSI EP09c (the standard clinical-lab guideline for exactly this kind of “compare a new method to an existing one” study; several of the cited papers name it directly, e.g. the Atellica HEMA 580 vs. Sysmex XN-1000 comparison). We can run the same recipe on our own paired data — system count vs. biomed-student manual count, per image, per cell type — and land in the same table your teammate already built, with our own row filled in using the same statistics instead of a bare accuracy percentage.
+Step 1 — build the paired dataset
+For every image where both a system count and a human count exist (the 72 biomed-labelled images, growing later with the self-collected slides), record one row per cell type:
+image_id, cell_type, system_count, manual_count
+This is the same pairing used in Part 2/3 of this note — nothing new needs to be collected to start this analysis. Keep RBC, WBC, and platelets as separate rows/analyses throughout, the same way every cited paper reports each parameter separately rather than pooling cell types together.
+Step 2 — correlation coefficient (r / R²)
+Compute Pearson's r between the system counts and manual counts for each cell type (Spearman's rank correlation if the counts aren't roughly normally distributed, e.g. for platelets where counts can be skewed). This is a two-line calculation:
+from scipy.stats import pearsonr, spearmanr
+r, p_value = pearsonr(system_counts, manual_counts)
+Report r (or R² = r², whichever your teammate's table uses per source) per cell type, exactly like the “r = 0.999 (RBC), 0.996 (WBC)…” rows in Section 5.
+Step 3 — method-comparison regression (Passing-Bablok, not plain OLS)
+None of the cited papers use ordinary least-squares regression for this — OLS assumes the x-axis method is error-free, which isn't true when comparing two imperfect counting methods (ours and the biomed student's). That's why the field uses Passing-Bablok or Deming regression instead, and it's why several of the Section 5 papers explicitly name Passing-Bablok. The output is a slope and intercept with confidence intervals, read the same way the DxH 900 paper reads them:
+Intercept's 95% CI excludes 0 → a systematic (constant) offset between our system and the manual counts.
+Slope's 95% CI excludes 1 → a proportional bias (we increasingly over- or under-count as the true count gets larger).
+In Python, the pyCompare package implements both Passing-Bablok regression and Bland-Altman plotting in the same library used in several published method-comparison papers:
+pip install pyCompare
+import pyCompare
+pyCompare.blandAltman(system_counts, manual_counts)
+(pyCompare's blandAltman() call also returns the Passing-Bablok slope/intercept when passed the relevant flag — check the package README for the current call signature, since this detail can change between versions.)
+Step 4 — Bland-Altman bias and 95% limits of agreement
+Already covered in Part 2 — same formula, now run on the full paired set rather than a worked example:
+bias = mean(system_count − manual_count)
+LoA = bias ± 1.96 × SD(system_count − manual_count)
+Report bias and LoA per cell type. This is the number that lines up directly with rows like “Bland-Altman bias 0.5% (Hct), 0.1×10⁹/L (WBC)…” in the QBC Autoread Plus row of Section 5, or the “LoA −11.8 to 8.6” for platelets on the Sysmex XR-series — same units, same statistic, directly comparable side by side.
+Step 5 — sample size, honestly stated
+CLSI EP09c (the guideline several Section 5 papers cite) typically expects on the order of 40+ paired samples spanning the low/normal/high range of each parameter, sometimes collected across multiple days to capture day-to-day variation — the cited studies range from n=44 (Atellica HEMA 580 vs. XN-1000) up to n=765 (pediatric XN-1000 study). With 72 images — fewer once split by cell type and after any exclusions — we're below the lower end of that range, and it's worth saying so plainly in the paper (with a confidence interval on r and on the Bland-Altman bias, as flagged in Part 3) rather than presenting the numbers as if they carry the same statistical weight as a 765-sample clinical validation. The self-collected-samples step in the next-steps list is what closes this gap over time.
+Step 6 — drop the result straight into the Section 5 table
+Once Steps 1–4 are run, our system's row reads the same way every other row in Section 5 does — no separate table format needed:
+System
+Compared against
+Reported numbers
+Source
+Our system (SSDLite / EfficientNet-B0 on Pi)
+Biomed-student manual counts, 72-image set (n to be confirmed per cell type)
+r = [fill in] (RBC), [fill in] (WBC), [fill in] (PLT); Bland-Altman bias/LoA = [fill in] per cell type; Passing-Bablok slope/intercept = [fill in]
+This study
+That row, sitting directly under the high-end and low-end rows from Section 5, is what actually answers “how does our method compare to current lab methods” in the advisor's own terms — not a converted accuracy percentage, but the same r / regression / Bland-Altman language the whole field already reports in.
+7. Metrics checklist for the results section
+Metric
+What it tells you
+Needs
+Accuracy / Precision / Recall / F1
+Correctness against labelled ground truth
+Labelled test set (BCCD test split + 72-image set)
+mAP@0.5, mAP@0.5:0.95
+Detection quality (localization + classification)
+Bounding-box labels (already have, via BCCD/VOC format)
+CV% (field-to-field)
+Repeatability across re-imaging of the same specimen
+Multiple fields of one slide (Protocol A)
+CV% (algorithmic)
+Pure model reproducibility under simulated re-capture
+One image, repeated runs with small jitter (Protocol B)
+Bland-Altman bias & LoA
+Agreement with the human/manual reference, no assumed truth
+Paired system vs. manual counts (72-image set)
+ICC(2,1)
+Single-number absolute-agreement score vs. manual reference
+Same paired data as Bland-Altman
+Expected Calibration Error
+Whether confidence scores mean what they claim to
+Model confidence outputs + correctness per prediction
+Inter-annotator kappa / ICC
+How noisy the human reference itself is
+Second annotator on a subset of the 72 images
+Everything above except mAP and the confusion matrix can be computed from data you already have (BCCD labels + the 72 biomed-labelled images) without waiting on the own-sample collection in step 2.
