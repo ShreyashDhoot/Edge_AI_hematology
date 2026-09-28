@@ -1,0 +1,200 @@
+.gitignore [403.0B]
+  README.md [4.1KB]
+  dataset.py [9.7KB]
+  generate_report.py [5.1KB]
+  losses.py [2.5KB]
+  metrics_evaluation.py [7.5KB]
+  paper_eval.py [41.4KB]
+  quantize_and_infer.py [2.3KB]
+  requirements.txt [231.0B]
+  server_tree.txt [0.0B]
+  test_pipeline.py [3.1KB]
+  train.py [8.4KB]
+  yolov8n.pt [6.2MB]
+./data/
+./data/BCCD_r/
+  .gitignore [12.0B]
+  LICENSE [1.0KB]
+  README.md [3.1KB]
+  example.jpg [64.8KB]
+  export.py [1.7KB]
+  plot.py [3.4KB]
+  test.csv [198.9KB]
+./data/BCCD_r/BCCD/
+./data/BCCD_r/BCCD/Annotations/
+  [COLLAPSED: 364 files | 364 .xml]
+  ├── BloodImage_00000.xml
+  ├── BloodImage_00001.xml
+  ├── BloodImage_00002.xml
+  ├── ...
+  ├── BloodImage_00408.xml
+  ├── BloodImage_00409.xml
+  └── BloodImage_00410.xml
+./data/BCCD_r/BCCD/ImageSets/
+./data/BCCD_r/BCCD/ImageSets/Main/
+  test.txt [1.2KB]
+  train.txt [3.4KB]
+  trainval.txt [4.8KB]
+  val.txt [1.4KB]
+./data/BCCD_r/BCCD/JPEGImages/
+  [COLLAPSED: 364 files | 364 .jpg]
+  ├── BloodImage_00000.jpg
+  ├── BloodImage_00001.jpg
+  ├── BloodImage_00002.jpg
+  ├── ...
+  ├── BloodImage_00408.jpg
+  ├── BloodImage_00409.jpg
+  └── BloodImage_00410.jpg
+./data/BCCD_r/BCCD/yolo_format/
+  data.yaml [135.0B]
+./data/BCCD_r/BCCD/yolo_format/images/
+./data/BCCD_r/BCCD/yolo_format/images/train/
+  [COLLAPSED: 310 files | 310 .jpg]
+  ├── BloodImage_00000.jpg
+  ├── BloodImage_00001.jpg
+  ├── BloodImage_00002.jpg
+  ├── ...
+  ├── BloodImage_00408.jpg
+  ├── BloodImage_00409.jpg
+  └── BloodImage_00410.jpg
+./data/BCCD_r/BCCD/yolo_format/images/val/
+  [COLLAPSED: 54 files | 54 .jpg]
+  ├── BloodImage_00008.jpg
+  ├── BloodImage_00013.jpg
+  ├── BloodImage_00014.jpg
+  ├── ...
+  ├── BloodImage_00375.jpg
+  ├── BloodImage_00379.jpg
+  └── BloodImage_00403.jpg
+./data/BCCD_r/BCCD/yolo_format/labels/
+  train.cache [139.2KB]
+  val.cache [24.0KB]
+./data/BCCD_r/BCCD/yolo_format/labels/train/
+  [COLLAPSED: 310 files | 310 .txt]
+  ├── BloodImage_00000.txt
+  ├── BloodImage_00001.txt
+  ├── BloodImage_00002.txt
+  ├── ...
+  ├── BloodImage_00408.txt
+  ├── BloodImage_00409.txt
+  └── BloodImage_00410.txt
+./data/BCCD_r/BCCD/yolo_format/labels/val/
+  [COLLAPSED: 54 files | 54 .txt]
+  ├── BloodImage_00008.txt
+  ├── BloodImage_00013.txt
+  ├── BloodImage_00014.txt
+  ├── ...
+  ├── BloodImage_00375.txt
+  ├── BloodImage_00379.txt
+  └── BloodImage_00403.txt
+./data/BCCD_r/dataset/
+./data/BCCD_r/dataset/mxnet/
+  prepro.py [2.5KB]
+  test.py [2.2KB]
+./data/BCCD_r/scripts/
+  split.py [1.8KB]
+  visualize.py [1.4KB]
+./data/clinical_72/
+  .DS_Store [6.0KB]
+./data/clinical_72/annotations/
+  [COLLAPSED: 72 files | 72 .xml]
+  ├── BloodImage_00007.xml
+  ├── BloodImage_00011.xml
+  ├── BloodImage_00015.xml
+  ├── ...
+  ├── BloodImage_00390.xml
+  ├── BloodImage_00391.xml
+  └── BloodImage_00407.xml
+./data/clinical_72/images/
+  [COLLAPSED: 364 files | 364 .jpeg]
+  ├── BloodImage_00000.jpeg
+  ├── BloodImage_00001.jpeg
+  ├── BloodImage_00002.jpeg
+  ├── ...
+  ├── BloodImage_00408.jpeg
+  ├── BloodImage_00409.jpeg
+  └── BloodImage_00410.jpeg
+./models/
+  __init__.py [791.0B]
+  picodet_model.py [1.6KB]
+  ssdlite_mobilenetv3.py [1.2KB]
+  yolov8_model.py [1.3KB]
+./outputs/
+  Clinical_Triage_Report.pdf [2.9KB]
+  yolov8n_int8.onnx [3.2MB]
+./outputs/checkpoints/
+  [COLLAPSED: 1 files | 1 .pth]
+  ├── ssdlite_mobilenetv3_best.pth
+  ├── ssdlite_mobilenetv3_best.pth
+./outputs/checkpoints/ssdlite_mobilenetv3_hematology/
+  results.csv [5.0KB]
+  results.png [128.9KB]
+  val_batch0_labels.jpg [50.5KB]
+  val_batch0_pred.jpg [51.2KB]
+./outputs/checkpoints/ssdlite_mobilenetv3_hematology/weights/
+  [COLLAPSED: 2 files | 2 .pt]
+  ├── best.pt
+  ├── last.pt
+  ├── best.pt
+  ├── last.pt
+./outputs/clinical_results/
+  SSDLite_Clinical72_Platelets_bland_altman.png [97.9KB]
+  SSDLite_Clinical72_RBC_bland_altman.png [117.3KB]
+  SSDLite_Clinical72_WBC_bland_altman.png [88.2KB]
+  SSDLite_Clinical72_evaluation_report.json [2.8KB]
+  YOLOv8n_Clinical72_Platelets_bland_altman.png [100.1KB]
+  YOLOv8n_Clinical72_RBC_bland_altman.png [123.5KB]
+  YOLOv8n_Clinical72_WBC_bland_altman.png [96.7KB]
+  YOLOv8n_Clinical72_evaluation_report.json [2.9KB]
+./outputs/test_run/
+  Sample_Diagnostic_Report.pdf [12.7KB]
+  Test_YOLOv8n_Platelets_bland_altman.png [91.0KB]
+  Test_YOLOv8n_RBC_bland_altman.png [89.2KB]
+  Test_YOLOv8n_WBC_bland_altman.png [90.5KB]
+  Test_YOLOv8n_evaluation_report.json [2.5KB]
+  annotated_smear.jpg [7.5KB]
+  sample_smear.jpg [2.0KB]
+./paper_results/
+  fig_ba_BCCD.pdf [23.7KB]
+  fig_confusion_BCCD.pdf [18.6KB]
+  fig_pb_BCCD.pdf [20.7KB]
+  fig_reliability.pdf [15.0KB]
+  paper_numbers.tex [139.0B]
+  results.json [6.3KB]
+  table_agreement.tex [0.0B]
+  table_cv.tex [71.0B]
+  table_detection.tex [170.0B]
+./runs/
+./runs/detect/
+./runs/detect/outputs/
+./runs/detect/outputs/checkpoints/
+./runs/detect/outputs/checkpoints/yolov8n_hematology/
+  BoxF1_curve.png [170.6KB]
+  BoxPR_curve.png [124.0KB]
+  BoxP_curve.png [135.7KB]
+  BoxR_curve.png [159.6KB]
+  args.yaml [1.7KB]
+  confusion_matrix.png [110.9KB]
+  confusion_matrix_normalized.png [119.9KB]
+  labels.jpg [158.8KB]
+  results.csv [6.8KB]
+  results.png [300.2KB]
+  train_batch0.jpg [639.0KB]
+  train_batch1.jpg [574.9KB]
+  train_batch2.jpg [544.6KB]
+  val_batch0_labels.jpg [641.4KB]
+  val_batch0_pred.jpg [747.9KB]
+  val_batch1_labels.jpg [507.5KB]
+  val_batch1_pred.jpg [752.6KB]
+./runs/detect/outputs/checkpoints/yolov8n_hematology/weights/
+  [COLLAPSED: 3 files | 2 .pt, 1 .onnx]
+  ├── best.onnx
+  ├── best.pt
+  ├── last.pt
+  ├── best.onnx
+  ├── best.pt
+  └── last.pt
+./weights/
+  [COLLAPSED: 1 files | 1 .pt]
+  ├── yolo26n.pt
+  ├── yolo26n.pt
