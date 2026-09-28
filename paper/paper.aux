@@ -48,16 +48,16 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-E}}Dual-Tier Evaluation Protocol}{3}{subsection.3.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-E}0a}Tier 1: Computer Vision Detection Metrics}{3}{paragraph.3.5.0.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-E}0b}Tier 2: Clinical Method-Comparison Statistics}{3}{paragraph.3.5.0.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Qualitative blood smear detection output: (a) ground truth bounding boxes; (b) YOLOv8n predictions. The model correctly identifies leukocytes and platelets amidst high erythrocyte density.}}{4}{figure.2}\protected@file@percent }
-\newlabel{fig:qualitative}{{2}{4}{Qualitative blood smear detection output: (a) ground truth bounding boxes; (b) YOLOv8n predictions. The model correctly identifies leukocytes and platelets amidst high erythrocyte density}{figure.2}{}}
 \@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-E}0c}Calibration Assessment}{4}{paragraph.3.5.0.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {IV}Experimental Results}{4}{section.4}\protected@file@percent }
 \newlabel{sec:results}{{IV}{4}{Experimental Results}{section.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Detection Performance Across Datasets (Tier 1)}{4}{subsection.4.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Qualitative Analysis and Error Characterization}{4}{subsection.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Clinical Method-Comparison Statistics (Tier 2)}{4}{subsection.4.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Qualitative blood smear detection output: (a) ground truth bounding boxes; (b) YOLOv8n predictions. The model correctly identifies leukocytes and platelets amidst high erythrocyte density.}}{4}{figure.2}\protected@file@percent }
+\newlabel{fig:qualitative}{{2}{4}{Qualitative blood smear detection output: (a) ground truth bounding boxes; (b) YOLOv8n predictions. The model correctly identifies leukocytes and platelets amidst high erythrocyte density}{figure.2}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Normalized confusion matrix on the BCCD test set ($n = 364$). Off-diagonal mass is confined strictly to background (BG) boundary fragments rather than inter-cell confusion.}}{4}{figure.3}\protected@file@percent }
 \newlabel{fig:confusion}{{3}{4}{Normalized confusion matrix on the BCCD test set ($n = 364$). Off-diagonal mass is confined strictly to background (BG) boundary fragments rather than inter-cell confusion}{figure.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Clinical Method-Comparison Statistics (Tier 2)}{4}{subsection.4.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {IV-C}0a}Platelet Agreement}{4}{paragraph.4.3.0.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {IV-C}0b}White Blood Cell Agreement}{4}{paragraph.4.3.0.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {IV-C}0c}Red Blood Cell Disparity}{4}{paragraph.4.3.0.3}\protected@file@percent }
@@ -76,16 +76,16 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-E}}Model Calibration}{5}{subsection.4.5}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Passing--Bablok regression trajectories for RBC, WBC, and Platelets. Dashed line denotes identity ($y = x$); solid line shows non-parametric fit.}}{5}{figure.5}\protected@file@percent }
 \newlabel{fig:pb_plots}{{5}{5}{Passing--Bablok regression trajectories for RBC, WBC, and Platelets. Dashed line denotes identity ($y = x$); solid line shows non-parametric fit}{figure.5}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Reliability diagram of confidence calibration on the BCCD test set ($\text  {ECE} = 0.134$).}}{5}{figure.6}\protected@file@percent }
-\newlabel{fig:calibration}{{6}{5}{Reliability diagram of confidence calibration on the BCCD test set ($\text {ECE} = 0.134$)}{figure.6}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Comparison with published blood smear detection architectures on BCCD. $\dagger $Evaluated on custom augmentations. $\ddagger $Edge denotes standalone ARM CPU execution without discrete GPU.}}{5}{table.3}\protected@file@percent }
+\newlabel{tab:sota_compare}{{III}{5}{Comparison with published blood smear detection architectures on BCCD. $\dagger $Evaluated on custom augmentations. $\ddagger $Edge denotes standalone ARM CPU execution without discrete GPU}{table.3}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-F}}Comparison with State-of-the-Art Methods}{5}{subsection.4.6}\protected@file@percent }
 \citation{rumke1985}
 \citation{sysmex2020,horiba2022}
 \citation{rumke1985}
 \citation{who2011}
 \citation{sysmex2020}
-\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Comparison with published blood smear detection architectures on BCCD. $\dagger $Evaluated on custom augmentations. $\ddagger $Edge denotes standalone ARM CPU execution without discrete GPU.}}{6}{table.3}\protected@file@percent }
-\newlabel{tab:sota_compare}{{III}{6}{Comparison with published blood smear detection architectures on BCCD. $\dagger $Evaluated on custom augmentations. $\ddagger $Edge denotes standalone ARM CPU execution without discrete GPU}{table.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Reliability diagram of confidence calibration on the BCCD test set ($\text  {ECE} = 0.134$).}}{6}{figure.6}\protected@file@percent }
+\newlabel{fig:calibration}{{6}{6}{Reliability diagram of confidence calibration on the BCCD test set ($\text {ECE} = 0.134$)}{figure.6}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Methodological positioning against manual differential microscopy and automated clinical analyzers. Manual values cite inter-rater studies~\cite  {rumke1985}; analyzer values cite manufacturer validation data~\cite  {sysmex2020, horiba2022}.}}{6}{table.4}\protected@file@percent }
 \newlabel{tab:analyzer_compare}{{IV}{6}{Methodological positioning against manual differential microscopy and automated clinical analyzers. Manual values cite inter-rater studies~\cite {rumke1985}; analyzer values cite manufacturer validation data~\cite {sysmex2020, horiba2022}}{table.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-G}}Benchmarking Relative to Clinical Standards}{6}{subsection.4.7}\protected@file@percent }
@@ -95,7 +95,6 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Cross-Modality Disparity: Impedance vs. Optical Smears}{6}{subsection.5.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}Domain Shift and Staining Generalization}{6}{subsection.5.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}Edge Deployment and Operational Feasibility}{6}{subsection.5.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-E}}Limitations}{6}{subsection.5.5}\protected@file@percent }
 \bibstyle{IEEEtran}
 \bibdata{references}
 \bibcite{briggs2009}{1}
@@ -120,6 +119,7 @@
 \bibcite{koo2016}{20}
 \bibcite{passing1983}{21}
 \bibcite{deming1943}{22}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-E}}Limitations}{7}{subsection.5.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {VI}Conclusion and Future Work}{7}{section.6}\protected@file@percent }
 \newlabel{sec:conclusion}{{VI}{7}{Conclusion and Future Work}{section.6}{}}
 \@writefile{toc}{\contentsline {section}{References}{7}{section*.3}\protected@file@percent }
