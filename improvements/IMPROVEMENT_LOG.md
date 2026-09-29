@@ -47,3 +47,27 @@
 | R1-C20 | MINOR | Crit. 1 §4.6, Crit. 2 §H | Missing `\IEEEpeerreviewmaketitle` | FIX | Done | Added `\IEEEpeerreviewmaketitle`. |
 | R1-C21 | MINOR | Crit. 1 §4.4, Crit. 2 §J | Supplementary figures generated but omitted from paper | FIX | Done | Integrated key figures into text; logged Task T-02 for repeatability CV%. |
 | R1-C22 | MINOR | Crit. 1 §5.2, Crit. 2 §L | Thin bibliography (15 references) | FIX | Done | Expanded bibliography to 22 authoritative citations with DOIs (CLSI, Bland-Altman, CellProfiler, Deming). |
+
+---
+
+## Issue Registry (Round 2)
+
+| ID | Severity | Critique Source | Category / Issue | Label | Status | What Changed / What's Pending |
+|---|---|---|---|---|---|---|
+| R2-C01 | MAJOR | Crit. 1 §1, Crit. 2 §2 | Platelet OOD collapse unaddressed in clinical triage narrative | FIX | Done | Abstract, Sec. IV-A, and Sec. V-C bound operational claims to leukocyte-primary screening. |
+| R2-C02 | MAJOR | Crit. 1 §2, Crit. 2 §4 | Single-seed training evaluation ($seed=0$) lacks variance estimates | SERVER | Awaiting server results | Logged Task T-G02 across seeds 0, 1, and 2 for empirical confidence bounds ($\pm \sigma$). |
+| R2-C03 | MINOR | Crit. 1 §3 | Vague "3.4 W" power draw measurement method | FIX | Done | Clarified inline USB-C digital power analyzer measurement under sustained 4-core load in Sec. III-A and V-D. |
+| R2-C04 | MINOR | Crit. 1 §4 | Generic future work in Conclusion | FIX | Done | Specified motorized micro-stepping stage controllers with automated focus stacking in Sec. VI. |
+
+---
+
+## Issue Registry (Round 3)
+
+| ID | Severity | Critique Source | Category / Issue | Label | Status | What Changed / What's Pending |
+|---|---|---|---|---|---|---|
+| R3-C01 | MAJOR | Crit. 2 §1.1 | Premature claim: Section III-D titled "Generalization Recipe" before proof | FIX | Done | Renamed Section III-D to "Invariance-Augmented Training and Domain Adaptation Pipeline". |
+| R3-C02 | MAJOR | Crit. 1 §2, Crit. 2 §3.1 | TTA latency conflict: 4.1 FPS streaming claim contradicts 4-rotation TTA | FIX | Done | Clarified in Sec. III-B that 4.1 FPS is for live viewfinder, while TTA operates on static captured fields. |
+| R3-C03 | MAJOR | Crit. 1 §2, Crit. 2 §2.2 | Sample size divergence in Table V: row (g) $n=22$ vs rows (b)-(f) $n=72$ | FIX | Done | Added explicit caveat in Sec. IV-H highlighting $n=22$ held-out split isolation and non-comparability. |
+| R3-C04 | FATAL | Crit. 2 §2.1 | Risk of clinical fine-tuning leakage across full 72 images | RISK | Flagged / Script Guarded | Audited evaluation script CLI; documented strict path isolation protocol in `SERVER_TASKS.md` (T-G06). |
+| R3-C05 | FATAL | Crit. 1 §1, Crit. 2 §1.1 | Table V contains unexecuted placeholder markers `[[PENDING: T-G06]]` | SERVER | Awaiting server results | Preserved baseline rows intact; logged Task T-G06 to ingest empirical outputs once server finishes. |
+
