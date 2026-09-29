@@ -128,12 +128,33 @@ The edge environment executes on 64-bit Raspberry Pi OS (Debian Linux kernel). T
 \paragraph{BCCD Benchmark} We utilize the public Blood Cell Count and Detection (BCCD) benchmark~\cite{bccd}, comprising 364 high-resolution microscopic blood smear field-of-view images captured at 100$\times$ magnification under Giemsa staining. Annotations follow Pascal VOC XML conventions, demarcating red blood cells (RBC), white blood cells (WBC), and platelets. We evaluate on the held-out test split ($n = 364$), containing 4,155 annotated RBCs, 372 WBCs, and 361 platelets.
 \paragraph{Independent Out-of-Distribution (OOD) Benchmark} To rigorously evaluate cross-domain generalization under staining variations and optical artifacts, an independent test set of 72 peripheral blood smear images was collected from a separate clinical laboratory protocol and independently annotated by a trained bioengineering investigator. This dataset comprises 1,733 RBCs, 101 WBCs, and 225 platelets. No images from this clinical set were included during model training or hyperparameter selection.
 
-\subsection{Model Architecture and Quantization}
-We adopt YOLOv8n (nano), an anchor-free single-stage object detector featuring a C2f-enhanced backbone, path-aggregation feature pyramid network (PAFPN), and decoupled detection heads~\cite{yolov8}. The network has 3.2\,M parameters and 8.7\,GFLOPs at $640 \times 640$ resolution. The three target classes (RBC, WBC, Platelets) replace the standard 80 COCO classes.
+\subsection{Model Architecture and Baseline Training}
+\label{sec:baseline_model}
+We use YOLOv8n (nano), an anchor-free single-stage object detector featuring a C2f-enhanced backbone, path-aggregation feature pyramid network (PAFPN), and decoupled detection heads~\cite{yolov8}. The network has 3.2\,M parameters and 8.7\,GFLOPs at $640 \times 640$ resolution. The three target classes (RBC, WBC, Platelets) replace the COCO classes.
 
-Training was conducted on an NVIDIA GPU using the SGD optimizer (momentum 0.937, weight decay $5 \times 10^{-4}$), initial learning rate of 0.01 with cosine annealing schedule down to 0.0001 over 100 epochs (batch size 16), and early stopping with a patience of 15 epochs. Data augmentations included horizontal/vertical flips, HSV color jitter, and mosaic augmentation.
+For the baseline model, training ran on an NVIDIA GPU using stochastic gradient descent (SGD) with momentum 0.937, weight decay $5 \times 10^{-4}$, and initial learning rate $\eta = 0.01$ decayed via cosine annealing to $10^{-4}$ across 100 epochs (batch size 16, seed 0). Early stopping halted training after 15 epochs without validation loss improvement. Augmentations followed standard settings: horizontal flips ($p=0.5$), HSV color jitter, and mosaic augmentation ($p=1.0$), with mosaic disabled during the final 10 epochs.
 
-Following convergence, the FP32 model checkpoint was exported to ONNX (opset 14) and dynamically quantized to INT8 using ONNX Runtime's \texttt{quantize\_dynamic} with 8-bit signed integer (\texttt{QInt8}) weights. Quantization compressed the model footprint from 6.3\,MB down to 3.2\,MB, enabling efficient on-chip execution.
+\subsection{Cross-Domain Generalization Recipe and Inference Adaptation}
+\label{sec:generalization_pipeline}
+To address cross-center domain shift on clinical smears, we implemented two complementary adaptation pipelines:
+
+\paragraph{Training-Time Invariance (v2 Model)}
+Microscopic cytology fields lack a canonical orientation. We introduced full rotational invariance ($\text{degrees} = 180.0$) and vertical flips ($\text{flipud} = 0.5$). To regularize decision boundaries, we added MixUp ($0.15$) and detection head dropout ($0.1$). Unaugmented stabilization was extended by disabling mosaic 15 epochs before completion, with early stopping patience increased to 20 epochs. While a copy-paste parameter ($0.15$) was specified, bounding-box annotations lack polygon boundary segments, so polygon-level cell cutouts do not execute in box-only YOLOv8; we record this setting without attributing gains to it.
+
+\paragraph{Clinical Few-Shot Fine-Tuning}
+We partitioned the 72 clinical images into a 50-image training split and a 22-image held-out evaluation split. Few-shot adaptation freezes the first 10 layers of the YOLOv8n backbone to retain general feature representations, updating only the detection heads with a reduced learning rate ($\eta = 10^{-3}$) over 30 epochs (batch size 8, patience 10). To prevent data leakage, fine-tuned models are evaluated strictly on the 22 held-out images.
+
+\paragraph{Inference-Time Chromatic and Spatial Adaptation}
+At test time, three modular stages adapt inputs before and after neural inference without retraining:
+\begin{enumerate}
+  \item \textbf{Reinhard Stain Normalization and CLAHE:} We transform input smear fields into CIELAB color space and match channel-wise mean and standard deviation to the BCCD reference training distribution ($L^* = 148.5 \pm 32.4$, $a^* = 142.3 \pm 18.2$, $b^* = 118.4 \pm 14.1$)~\cite{reinhard2001}. Contrast-Limited Adaptive Histogram Equalization (CLAHE, clip limit 2.0, $8 \times 8$ grid) is then applied to the lightness channel to sharpen cytoplasmic granules~\cite{zuiderveld1994}.
+  \item \textbf{Per-Class Confidence Thresholding:} Standard evaluation applies a uniform confidence cutoff ($\tau = 0.25$). Because thrombocytes exhibit lower contrast on faded smears, we set an independent platelet threshold ($\tau_{\text{PLT}} = 0.15$) while maintaining $\tau = 0.25$ for erythrocytes and leukocytes.
+  \item \textbf{Test-Time Augmentation (TTA):} The detector processes each input at four orthogonal rotations ($0^\circ, 90^\circ, 180^\circ, 270^\circ$). Bounding box coordinates are inverted to the primary orientation and fused using non-maximum suppression (IoU threshold 0.5).
+\end{enumerate}
+
+\subsection{Quantization and Embedded Deployment}
+\label{sec:quantization}
+Following convergence, the baseline FP32 model checkpoint was exported to ONNX (opset 14) and dynamically quantized to INT8 using ONNX Runtime's \texttt{quantize\_dynamic} with 8-bit signed integer (\texttt{QInt8}) weights. Quantization compressed the model footprint from 6.3\,MB to 3.2\,MB, enabling efficient on-chip execution.
 
 \subsection{Dual-Tier Evaluation Protocol}
 \paragraph{Tier 1: Computer Vision Detection Metrics}
@@ -224,7 +245,7 @@ Table~\ref{tab:agreement} details the CLSI EP09-A3 agreement metrics evaluating 
 \centering
 \caption{Clinical method-comparison statistics (CLSI EP09-A3 framework) on the BCCD benchmark ($n = 364$ fields). $r$ denotes Pearson correlation, $\rho$ Spearman rank correlation, ICC(2,1) two-way random-effects intraclass correlation, BA Bias mean difference, LoA 95\% limits of agreement, and P-B / Deming regression parameters.}
 \label{tab:agreement}
-\setlength{\tabcolsep}{4.5pt}
+\setlength{\tabcolsep}{4.0pt}
 \renewcommand{\arraystretch}{1.15}
 \begin{tabular}{lccccccccc}
 \toprule
@@ -322,6 +343,35 @@ Manual Microscopy~\cite{rumke1985} & 0.45--0.60 & 0.50--0.70 & 5--15\% & Negligi
 
 While high-end laboratory analyzers achieve superior precision (ICC $> 0.95$, CV $< 2\%$), our edge system attains platelet agreement (ICC = 0.862) comparable to mid-tier 3-part analyzers, while exceeding the typical lower-bound inter-rater consistency of manual differential microscopy (0.45–0.60).
 
+\subsection{Cross-Domain Generalization and Inference Adaptation Ablation}
+\label{sec:ablation}
+Table~\ref{tab:ablation} presents the structured ablation evaluating the training and inference adaptation strategies. Baseline zero-shot rows are preserved as reference points, while newly implemented configurations awaiting verified server completion are explicitly demarcated.
+
+\begin{table*}[!t]
+\centering
+\caption{Ablation of generalization and inference adaptation strategies. Baseline denotes zero-shot evaluation of the original BCCD-trained model. Cells marked PENDING indicate server evaluation runs queued in the task registry.}
+\label{tab:ablation}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llcccccc}
+\toprule
+\textbf{Configuration} & \textbf{Evaluation Split} & \textbf{Preprocessing} & \textbf{Post-Processing / TTA} & \textbf{mAP@0.5} & \textbf{RBC F1} & \textbf{WBC F1} & \textbf{PLT F1} \\
+\midrule
+(a) Baseline (YOLOv8n) & BCCD Test ($n=364$) & None & Default ($\tau=0.25$) & 0.856 & 0.65 & 0.98 & 0.84 \\
+(b) Baseline (Zero-Shot) & Clinical 72 ($n=72$) & None & Default ($\tau=0.25$) & 0.412 & 0.58 & 0.83 & 0.15 \\
+\midrule
+(c) Retrained (v2 Augmentations) & Clinical 72 ($n=72$) & None & Default ($\tau=0.25$) & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} \\
+(d) Retrained v2 + Stain Norm & Clinical 72 ($n=72$) & Reinhard + CLAHE & Default ($\tau=0.25$) & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} \\
+(e) Retrained v2 + Thresholding & Clinical 72 ($n=72$) & Reinhard + CLAHE & Per-Class ($\tau_{\text{PLT}}=0.15$) & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} \\
+(f) Retrained v2 + Full Pipeline & Clinical 72 ($n=72$) & Reinhard + CLAHE & $\tau_{\text{PLT}}=0.15$ + 4-Rot TTA & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} \\
+\midrule
+(g) Clinical Few-Shot Adapted & Clinical Val ($n=22$) & None & Default ($\tau=0.25$) & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} \\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}
+
 % ============================================================
 \section{Discussion}
 \label{sec:discussion}
@@ -339,11 +389,14 @@ The empirical results on our 72-image clinical out-of-distribution benchmark dem
 The quantized INT8 YOLOv8n pipeline executes at 245\,ms per frame ($\approx$4.1\,FPS) on the Raspberry Pi 4B CPU without external hardware accelerators. Sustained power consumption is measured at $\approx$3.4\,W under four-core load using an inline USB-C digital analyzer, allowing a 20\,Wh battery pack to deliver over 5 hours of continuous fieldwork. In a typical triage protocol, an operator inspects 10–20 fields per slide. An automated differential count of 100 leukocytes can be completed within 25–35 seconds of total acquisition time, matching or exceeding the pace of a human cytotechnologist while recording automated visual documentation.
 
 \subsection{Limitations}
-Several operational boundaries must be acknowledged:
+Several methodological and operational boundaries must be acknowledged:
 \begin{enumerate}
-  \item \textbf{Single-Center Slide Protocol:} While evaluated across two independent datasets, multi-center trials across varied geographical disease endemicities (e.g., severe microcytic anemia, malaria parasitemia) have not yet been completed.
+  \item \textbf{Small Held-Out Clinical Split:} The clinical few-shot adaptation split provides only 22 held-out images for validation. While informative as a preliminary feasibility check, multi-center trials across varied geographic cohorts and staining variations are required.
+  \item \textbf{Inference Latency Overhead of TTA:} Four-rotation test-time augmentation requires four sequential forward passes per image, quadrupling inference latency from 245\,ms to approximately 980\,ms on the Raspberry Pi 4B CPU. This reduces throughput from 4.1\,FPS to $\approx$1.0\,FPS, shifting the system from real-time viewfinder streaming toward static field-by-field triage.
+  \item \textbf{Bundled Training Augmentations:} The retrained v2 model combines rotation, flips, MixUp, and head dropout simultaneously. Isolating the individual contribution of each hyperparameter requires factorial ablation runs.
+  \item \textbf{Post-Hoc Threshold Provenance:} The reduced platelet confidence threshold ($\tau_{\text{PLT}} = 0.15$) was selected upon inspecting empirical false negatives on clinical smears rather than derived from an independent cross-validation cohort.
   \item \textbf{Sub-Type Differential Depth:} The present model detects general WBCs rather than performing a complete 5-part differential (neutrophils, lymphocytes, monocytes, eosinophils, basophils).
-  \item \textbf{Absence of Simultaneous Coulter Reference:} Due to ethical and logistical constraints, blood draws were not split simultaneously between an automated flow cytometer and our microscope frame.
+  \item \textbf{Absence of Simultaneous Coulter Reference:} Due to ethical and logistical constraints in field settings, blood draws were not split simultaneously between an automated flow cytometer and our microscope frame.
 \end{enumerate}
 
 % ============================================================
