@@ -153,12 +153,23 @@ python eval_generalized.py \
     --original_weights runs/detect/outputs/checkpoints/yolov8n_hematology/weights/best.pt \
     --bccd_test /LAB/edge_hematology_ai/data/BCCD_r/BCCD/yolo_format \
     --clinical_dir /LAB/edge_hematology_ai/data/clinical_72 \
-    --clinical_test_dir outputs/generalized/clinical_split/images/val \
     --bccd_ref_dir /LAB/edge_hematology_ai/data/BCCD_r/BCCD/JPEGImages \
     --out outputs/generalized/results \
     --use_stain_norm \
     --use_tta \
     --plt_conf 0.15
+
+# Step 5b: Evaluate Fine-Tuned Model on Held-Out 22-Image Validation Split
+if [ -d "outputs/generalized/clinical_split/images/val" ]; then
+    python eval_generalized.py \
+        --weights outputs/generalized/checkpoints/yolov8n_hematology_v2_clinical/weights/best.pt \
+        --bccd_test /LAB/edge_hematology_ai/data/BCCD_r/BCCD/yolo_format \
+        --clinical_dir outputs/generalized/clinical_split/images/val \
+        --bccd_ref_dir /LAB/edge_hematology_ai/data/BCCD_r/BCCD/JPEGImages \
+        --out outputs/generalized/results_finetuned_val \
+        --use_stain_norm \
+        --plt_conf 0.15
+fi
 
 echo "=== Step 6: Archiving Outputs into server/results/ ==="
 mkdir -p server/results/T-G01 server/results/T-G04 server/results/T-G05 server/results/T-G06
@@ -166,6 +177,9 @@ cp -r outputs/generalized/checkpoints/yolov8n_hematology_v2/weights/best.pt serv
 cp -r outputs/generalized/checkpoints/yolov8n_hematology_v2_clinical/weights/best.pt server/results/T-G04/
 cp -r outputs/generalized/onnx/* server/results/T-G05/
 cp -r outputs/generalized/results/* server/results/T-G06/
+if [ -d "outputs/generalized/results_finetuned_val" ]; then
+    cp -r outputs/generalized/results_finetuned_val/* server/results/T-G06/
+fi
 
 echo "=== ALL SERVER PIPELINE STEPS COMPLETED SUCCESSFULLY ==="
 ```
