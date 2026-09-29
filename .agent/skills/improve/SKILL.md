@@ -43,7 +43,8 @@ Create the folders you own as needed. If the user is in a plain chat without fil
 - **Use only paths and files that exist** in the repo or `server/project_tree.tsv`. Never guess a directory, script name, or config key. If something is missing, ask.
 - **Prefer existing artifacts over re-running.** If logs or result files already exist on the server, extract from them first. This saves hours and GPU time.
 - **Scripts are safe by default.** The user will run your code on a machine they care about. Read-only unless writing is required, never overwrite or delete, no `sudo`, no credentials, no surprise installs or network calls.
-- **Preserve the author's meaning and voice.** Edit for clarity and correctness. If a critique item can only be fixed by weakening a claim, weaken it.
+- **Preserve the author's meaning; the voice follows the paper-writing skill.** Edit for clarity and correctness. If a critique item can only be fixed by weakening a claim, weaken it.
+- **Every prose edit goes through the paper-writing skill.** Whenever you write or change any wording in `paper/*.tex` (abstract, body, captions, headings, sentences added around results), first read `.agent/skills/paper-writing/SKILL.md` and follow it, including its checker. The paper should read as plain, short, low-number prose, not as numbers thrown at the reader. Skipping it re-introduces the verbosity and number-dumping the critiques keep flagging.
 - **Do not cite what has not been read.** Propose candidates in `improvements/reading-list.md`; only references the user confirms they have read go into `references.bib`.
 - **State what you could not do.** Anything needing the user's judgment, or unfixable, is listed openly.
 - **Keep diffs small and reviewable.** Edit surgically instead of rewriting whole files, so `git diff` stays readable.
@@ -102,16 +103,20 @@ Do Bucket A immediately. Bucket B becomes scripts. Bucket C becomes a short numb
 
 **Before editing:** if the repo is under git, check `git status`. Work on a new branch named `improve/round-N` so every change is reviewable with `git diff`. Do not commit to the main branch, push, or rewrite history unless asked.
 
+**Writing trigger (mandatory).** Before you change any prose, read `.agent/skills/paper-writing/SKILL.md`, save a copy of the current `paper.tex` (`git show HEAD:paper/paper.tex > /tmp/paper_before.tex`), and run `python .agent/skills/paper-writing/scripts/prose_check.py paper/paper.tex` to find the hotspots. Apply the skill's rules to everything you write. The "Text" bullet below is done through that skill, not from memory.
+
 **Edit `paper/paper.tex` and `paper/references.bib` in place.** Use the critique's IEEE audit as the checklist:
 
 - **Front matter:** title, abstract (single paragraph, self-contained, no citations or undefined abbreviations), `\IEEEkeywords`, author block.
-- **Text:** heading structure, acronyms defined at first body use, tense, filler words, redundancy, flow, inconsistent terminology.
+- **Text (via the paper-writing skill):** heading structure, acronyms defined at first body use, tense, filler words, verbosity, number density, redundancy, flow, inconsistent terminology.
 - **IEEEtran hygiene:** remove layout hacks that fight the template (`geometry`, `\linespread`, forced font sizes, `\vspace` tricks, `\sloppy` used to hide overfull lines, manual `\small` in body text). These are formatting violations. Use `Fig.~\ref{}` and `Table~\ref{}`, cite equations as `(\ref{})` in IEEE style, put captions below figures and above tables, and place `\label` after `\caption`. Fix overfull lines by rewording, not by suppressing warnings.
 - **Citations:** sorted numeric style via `IEEEtran.bst` and the `cite` package, brackets before punctuation, `in [3]` not `in Ref. [3]`.
 - **`references.bib`:** normalize entries (author, title, year, venue, volume, number, pages, DOI), remove duplicates and unused entries, use `and others` instead of a literal "et al.", protect capitalization with braces, and make types correct (`@article`, `@inproceedings`, `@misc` for arXiv). Verify with web search when available that every entry really exists. Never invent an entry; flag suspicious ones to the user.
 - **Figures:** reference every figure and discuss it in the text. Prefer vector PDF over raster. Use `\includegraphics[width=\columnwidth]` (3.5 in) or `\textwidth` for a full-width figure (7.16 in). Keep file names stable so `\includegraphics` lines don't need changing.
 
 Where an edit depends on pending evidence, insert a visible marker such as `\textbf{[[PENDING: 03_ablation -> Table III]]}` so it cannot slip into a submission unnoticed. Before calling any version final, search the repo for `PENDING` and list what remains.
+
+**Prose verification (after every round of prose edits).** Run `python .agent/skills/paper-writing/scripts/prose_check.py --compare /tmp/paper_before.tex paper/paper.tex` and then the plain diagnose command again. No number may vanish or appear without a source, no citation or label may be lost, and no HIGH flag may remain. Report the outcome in the changelog.
 
 **Compile and verify.** If `latexmk` or `pdflatex` is available:
 
@@ -177,7 +182,7 @@ For each new folder in `server/results/` not yet marked ingested:
 1. **Validate first.** Look for errors, empty or partial outputs, mismatched seeds, and implausible values (a metric of exactly 1.000, zero variance, a small baseline beating a far larger model by a wide margin). Investigate and tell the user rather than absorbing it. Confirm the outputs correspond to the code version the paper describes.
 2. **Reconcile with existing claims.** If numbers differ from the paper, update the paper and rewrite the affected claims. If a claim no longer holds, say so directly.
 3. **Propagate every change.** A number usually appears in the abstract, introduction, results, discussion, captions, and conclusion. Search the whole paper for each changed value and update every occurrence.
-4. **Add what reviewers asked for:** experimental-setup details (hardware, software versions, seeds, hyperparameters), mean ± std or confidence intervals, significance results, ablation and baseline tables, dataset statistics, and any limitation the new evidence reveals.
+4. **Write the new results text with the paper-writing skill:** one paragraph per question, the answer first, one or two numbers against the baseline, a pointer to the table. Full numbers live in the tables, not in the sentences. **Add what reviewers asked for:** experimental-setup details (hardware, software versions, seeds, hyperparameters), mean ± std or confidence intervals, significance results, ablation and baseline tables, dataset statistics, and any limitation the new evidence reveals.
 5. **Copy figures** into `paper/figures/` and update `\includegraphics` only if names changed. Verify width, font size, and that each figure is cited and discussed.
 6. **Replace every `PENDING` marker** with the real content and remove the marker. Recompile and re-verify (Step 3).
 7. Mark the results folder as ingested in the ledger.
