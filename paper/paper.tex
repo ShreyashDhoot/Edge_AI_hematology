@@ -122,7 +122,7 @@ The physical system consists of four interconnected subsystems, illustrated in F
 The total capital expenditure for this edge setup is approximately \$275 (\$75 single-board computer, \$50 sensor, and \$150 optical frame), representing a fraction of the cost of commercial analyzers.
 
 \subsection{Software Stack and Edge Runtime}
-The edge environment executes on 64-bit Raspberry Pi OS (Debian Linux kernel). The inference runtime employs ONNX Runtime with an optimized CPU Execution Provider utilizing 4 threads matching the physical ARM cores. Digital slide captures are resized to $640 \times 640$ pixels, normalized, and streamed directly into the quantized inference pipeline. Automated summary triage reports are compiled on-device.
+The edge environment executes on 64-bit Raspberry Pi OS (Debian Linux kernel). The inference runtime employs ONNX Runtime with an optimized CPU Execution Provider utilizing 4 threads matching the physical ARM cores. Digital slide captures are resized to $640 \times 640$ pixels, normalized, and streamed directly into the quantized inference pipeline. Single-pass INT8 execution achieves approximately 4.1\,FPS (245\,ms latency) for interactive live viewfinder guidance, while multi-pass test-time augmentation runs on captured static fields. Automated summary triage reports are compiled on-device.
 
 \subsection{Datasets and Clinical Validation Protocol}
 \paragraph{BCCD Benchmark} We utilize the public Blood Cell Count and Detection (BCCD) benchmark~\cite{bccd}, comprising 364 high-resolution microscopic blood smear field-of-view images captured at 100$\times$ magnification under Giemsa staining. Annotations follow Pascal VOC XML conventions, demarcating red blood cells (RBC), white blood cells (WBC), and platelets. We evaluate on the held-out test split ($n = 364$), containing 4,155 annotated RBCs, 372 WBCs, and 361 platelets.
@@ -134,7 +134,7 @@ We use YOLOv8n (nano), an anchor-free single-stage object detector featuring a C
 
 For the baseline model, training ran on an NVIDIA GPU using stochastic gradient descent (SGD) with momentum 0.937, weight decay $5 \times 10^{-4}$, and initial learning rate $\eta = 0.01$ decayed via cosine annealing to $10^{-4}$ across 100 epochs (batch size 16, seed 0). Early stopping halted training after 15 epochs without validation loss improvement. Augmentations followed standard settings: horizontal flips ($p=0.5$), HSV color jitter, and mosaic augmentation ($p=1.0$), with mosaic disabled during the final 10 epochs.
 
-\subsection{Cross-Domain Generalization Recipe and Inference Adaptation}
+\subsection{Invariance-Augmented Training and Domain Adaptation Pipeline}
 \label{sec:generalization_pipeline}
 To address cross-center domain shift on clinical smears, we implemented two complementary adaptation pipelines:
 
@@ -345,7 +345,7 @@ While high-end laboratory analyzers achieve superior precision (ICC $> 0.95$, CV
 
 \subsection{Cross-Domain Generalization and Inference Adaptation Ablation}
 \label{sec:ablation}
-Table~\ref{tab:ablation} presents the structured ablation evaluating the training and inference adaptation strategies. Baseline zero-shot rows are preserved as reference points, while newly implemented configurations awaiting verified server completion are explicitly demarcated.
+Table~\ref{tab:ablation} presents the structured ablation evaluating the training and inference adaptation strategies. Baseline zero-shot rows are preserved as reference points, while newly implemented configurations awaiting verified server completion are explicitly demarcated. Crucially, row~(g) assesses few-shot adaptation strictly on the 22 held-out validation images to preserve zero-leakage protocol; its metrics should be evaluated within that validation cohort rather than directly contrasted against the 72-image zero-shot totals.
 
 \begin{table*}[!t]
 \centering

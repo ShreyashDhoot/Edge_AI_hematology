@@ -117,6 +117,17 @@ D.~N. Breslauer, R.~N. Maamari, P.~J. Dahlberg, W.~A. Lam, and D.~A. Fletcher,
 G.~Jocher, A.~Chaurasia, and J.~Qiu, ``{Ultralytics YOLOv8},''
   \url{https://github.com/ultralytics/ultralytics}, 2023.
 
+\bibitem{reinhard2001}
+E.~Reinhard, M.~Adhikhmin, B.~Gooch, and P.~Shirley, ``Color transfer between
+  images,'' \emph{IEEE Computer Graphics and Applications}, vol.~21, no.~5, pp.
+  34--41, 2001.
+
+\bibitem{zuiderveld1994}
+K.~Zuiderveld, ``Contrast limited adaptive histogram equalization,'' in
+  \emph{Graphics Gems IV}, P.~S. Heckbert, Ed.\hskip 1em plus 0.5em minus
+  0.4em\relax San Diego, CA: Academic Press Professional, Inc., 1994, pp.
+  474--485.
+
 \bibitem{wilson1927}
 E.~B. Wilson, ``Probable inference, the law of succession, and statistical
   inference,'' \emph{Journal of the American Statistical Association}, vol.~22,

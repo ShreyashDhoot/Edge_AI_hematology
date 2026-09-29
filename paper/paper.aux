@@ -32,69 +32,84 @@
 \newlabel{sec:method}{{III}{2}{Methodology}{section.3}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}Hardware and Optical Acquisition Pipeline}{2}{subsection.3.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}Software Stack and Edge Runtime}{2}{subsection.3.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Datasets and Clinical Validation Protocol}{2}{subsection.3.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-C}0a}BCCD Benchmark}{2}{paragraph.3.3.0.1}\protected@file@percent }
 \citation{yolov8}
+\citation{reinhard2001}
+\citation{zuiderveld1994}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces End-to-end edge-AI hematology screening architecture: optical microscope sample preparation, digital acquisition via the Raspberry Pi HQ camera, embedded CPU inference on Raspberry Pi 4B executing an INT8-quantized YOLOv8n engine, and automated clinical diagnostic report generation.}}{3}{figure.1}\protected@file@percent }
+\newlabel{fig:system_arch}{{1}{3}{End-to-end edge-AI hematology screening architecture: optical microscope sample preparation, digital acquisition via the Raspberry Pi HQ camera, embedded CPU inference on Raspberry Pi 4B executing an INT8-quantized YOLOv8n engine, and automated clinical diagnostic report generation}{figure.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Datasets and Clinical Validation Protocol}{3}{subsection.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-C}0a}BCCD Benchmark}{3}{paragraph.3.3.0.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-C}0b}Independent Out-of-Distribution (OOD) Benchmark}{3}{paragraph.3.3.0.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}Model Architecture and Baseline Training}{3}{subsection.3.4}\protected@file@percent }
+\newlabel{sec:baseline_model}{{\mbox  {III-D}}{3}{Model Architecture and Baseline Training}{subsection.3.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-E}}Invariance-Augmented Training and Domain Adaptation Pipeline}{3}{subsection.3.5}\protected@file@percent }
+\newlabel{sec:generalization_pipeline}{{\mbox  {III-E}}{3}{Invariance-Augmented Training and Domain Adaptation Pipeline}{subsection.3.5}{}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-E}0a}Training-Time Invariance (v2 Model)}{3}{paragraph.3.5.0.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-E}0b}Clinical Few-Shot Fine-Tuning}{3}{paragraph.3.5.0.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-E}0c}Inference-Time Chromatic and Spatial Adaptation}{3}{paragraph.3.5.0.3}\protected@file@percent }
 \citation{wilson1927}
 \citation{clsi2013}
 \citation{koo2016}
 \citation{bland1986}
 \citation{passing1983}
 \citation{deming1943}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces End-to-end edge-AI hematology screening architecture: optical microscope sample preparation, digital acquisition via the Raspberry Pi HQ camera, embedded CPU inference on Raspberry Pi 4B executing an INT8-quantized YOLOv8n engine, and automated clinical diagnostic report generation.}}{3}{figure.1}\protected@file@percent }
-\newlabel{fig:system_arch}{{1}{3}{End-to-end edge-AI hematology screening architecture: optical microscope sample preparation, digital acquisition via the Raspberry Pi HQ camera, embedded CPU inference on Raspberry Pi 4B executing an INT8-quantized YOLOv8n engine, and automated clinical diagnostic report generation}{figure.1}{}}
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-C}0b}Independent Out-of-Distribution (OOD) Benchmark}{3}{paragraph.3.3.0.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}Model Architecture and Quantization}{3}{subsection.3.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-E}}Dual-Tier Evaluation Protocol}{3}{subsection.3.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-E}0a}Tier 1: Computer Vision Detection Metrics}{3}{paragraph.3.5.0.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-E}0b}Tier 2: Clinical Method-Comparison Statistics}{3}{paragraph.3.5.0.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-E}0c}Calibration Assessment}{4}{paragraph.3.5.0.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-F}}Quantization and Embedded Deployment}{4}{subsection.3.6}\protected@file@percent }
+\newlabel{sec:quantization}{{\mbox  {III-F}}{4}{Quantization and Embedded Deployment}{subsection.3.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-G}}Dual-Tier Evaluation Protocol}{4}{subsection.3.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-G}0a}Tier 1: Computer Vision Detection Metrics}{4}{paragraph.3.7.0.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-G}0b}Tier 2: Clinical Method-Comparison Statistics}{4}{paragraph.3.7.0.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-G}0c}Calibration Assessment}{4}{paragraph.3.7.0.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {IV}Experimental Results}{4}{section.4}\protected@file@percent }
 \newlabel{sec:results}{{IV}{4}{Experimental Results}{section.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Detection Performance Across Datasets (Tier 1)}{4}{subsection.4.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Qualitative Analysis and Error Characterization}{4}{subsection.4.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Clinical Method-Comparison Statistics (Tier 2)}{4}{subsection.4.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Qualitative blood smear detection output: (a) ground truth bounding boxes; (b) YOLOv8n predictions. The model correctly identifies leukocytes and platelets amidst high erythrocyte density.}}{4}{figure.2}\protected@file@percent }
-\newlabel{fig:qualitative}{{2}{4}{Qualitative blood smear detection output: (a) ground truth bounding boxes; (b) YOLOv8n predictions. The model correctly identifies leukocytes and platelets amidst high erythrocyte density}{figure.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Normalized confusion matrix on the BCCD test set ($n = 364$). Off-diagonal mass is confined strictly to background (BG) boundary fragments rather than inter-cell confusion.}}{4}{figure.3}\protected@file@percent }
-\newlabel{fig:confusion}{{3}{4}{Normalized confusion matrix on the BCCD test set ($n = 364$). Off-diagonal mass is confined strictly to background (BG) boundary fragments rather than inter-cell confusion}{figure.3}{}}
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {IV-C}0a}Platelet Agreement}{4}{paragraph.4.3.0.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {IV-C}0b}White Blood Cell Agreement}{4}{paragraph.4.3.0.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {IV-C}0c}Red Blood Cell Disparity}{4}{paragraph.4.3.0.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Dual-dataset object detection performance of YOLOv8n on the held-out BCCD benchmark ($n = 364$) and the independent out-of-distribution (OOD) clinical benchmark ($n = 72$). Bracketed terms represent 95\% Wilson score confidence intervals.}}{5}{table.1}\protected@file@percent }
+\newlabel{tab:detection}{{I}{5}{Dual-dataset object detection performance of YOLOv8n on the held-out BCCD benchmark ($n = 364$) and the independent out-of-distribution (OOD) clinical benchmark ($n = 72$). Bracketed terms represent 95\% Wilson score confidence intervals}{table.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Qualitative blood smear detection output: (a) ground truth bounding boxes; (b) YOLOv8n predictions. The model correctly identifies leukocytes and platelets amidst high erythrocyte density.}}{5}{figure.2}\protected@file@percent }
+\newlabel{fig:qualitative}{{2}{5}{Qualitative blood smear detection output: (a) ground truth bounding boxes; (b) YOLOv8n predictions. The model correctly identifies leukocytes and platelets amidst high erythrocyte density}{figure.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Normalized confusion matrix on the BCCD test set ($n = 364$). Off-diagonal mass is confined strictly to background (BG) boundary fragments rather than inter-cell confusion.}}{5}{figure.3}\protected@file@percent }
+\newlabel{fig:confusion}{{3}{5}{Normalized confusion matrix on the BCCD test set ($n = 364$). Off-diagonal mass is confined strictly to background (BG) boundary fragments rather than inter-cell confusion}{figure.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Clinical Method-Comparison Statistics (Tier 2)}{5}{subsection.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {IV-C}0a}Platelet Agreement}{5}{paragraph.4.3.0.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Bland--Altman agreement plots comparing automated system counts against reference annotations across 364 test images. Horizontal dashed lines denote mean bias; dotted bounds denote 95\% limits of agreement (LoA).}}{5}{figure.4}\protected@file@percent }
+\newlabel{fig:ba_plots}{{4}{5}{Bland--Altman agreement plots comparing automated system counts against reference annotations across 364 test images. Horizontal dashed lines denote mean bias; dotted bounds denote 95\% limits of agreement (LoA)}{figure.4}{}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {IV-C}0b}White Blood Cell Agreement}{5}{paragraph.4.3.0.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {IV-C}0c}Red Blood Cell Disparity}{5}{paragraph.4.3.0.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Bland--Altman and Regression Trajectories}{5}{subsection.4.4}\protected@file@percent }
 \citation{carpenter2006}
 \citation{kc2021}
 \citation{shakarami2021}
 \citation{kc2021}
 \citation{liu2022}
-\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Dual-dataset object detection performance of YOLOv8n on the held-out BCCD benchmark ($n = 364$) and the independent out-of-distribution (OOD) clinical benchmark ($n = 72$). Bracketed terms represent 95\% Wilson score confidence intervals.}}{5}{table.1}\protected@file@percent }
-\newlabel{tab:detection}{{I}{5}{Dual-dataset object detection performance of YOLOv8n on the held-out BCCD benchmark ($n = 364$) and the independent out-of-distribution (OOD) clinical benchmark ($n = 72$). Bracketed terms represent 95\% Wilson score confidence intervals}{table.1}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Clinical method-comparison statistics (CLSI EP09-A3 framework) on the BCCD benchmark ($n = 364$ fields). $r$ denotes Pearson correlation, $\rho $ Spearman rank correlation, ICC(2,1) two-way random-effects intraclass correlation, BA Bias mean difference, LoA 95\% limits of agreement, and P-B / Deming regression parameters.}}{5}{table.2}\protected@file@percent }
-\newlabel{tab:agreement}{{II}{5}{Clinical method-comparison statistics (CLSI EP09-A3 framework) on the BCCD benchmark ($n = 364$ fields). $r$ denotes Pearson correlation, $\rho $ Spearman rank correlation, ICC(2,1) two-way random-effects intraclass correlation, BA Bias mean difference, LoA 95\% limits of agreement, and P-B / Deming regression parameters}{table.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Bland--Altman agreement plots comparing automated system counts against reference annotations across 364 test images. Horizontal dashed lines denote mean bias; dotted bounds denote 95\% limits of agreement (LoA).}}{5}{figure.4}\protected@file@percent }
-\newlabel{fig:ba_plots}{{4}{5}{Bland--Altman agreement plots comparing automated system counts against reference annotations across 364 test images. Horizontal dashed lines denote mean bias; dotted bounds denote 95\% limits of agreement (LoA)}{figure.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Bland--Altman and Regression Trajectories}{5}{subsection.4.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-E}}Model Calibration}{5}{subsection.4.5}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Passing--Bablok regression trajectories for RBC, WBC, and Platelets. Dashed line denotes identity ($y = x$); solid line shows non-parametric fit.}}{5}{figure.5}\protected@file@percent }
-\newlabel{fig:pb_plots}{{5}{5}{Passing--Bablok regression trajectories for RBC, WBC, and Platelets. Dashed line denotes identity ($y = x$); solid line shows non-parametric fit}{figure.5}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Comparison with published blood smear detection architectures on BCCD. $\dagger $Evaluated on custom augmentations. $\ddagger $Edge denotes standalone ARM CPU execution without discrete GPU.}}{5}{table.3}\protected@file@percent }
-\newlabel{tab:sota_compare}{{III}{5}{Comparison with published blood smear detection architectures on BCCD. $\dagger $Evaluated on custom augmentations. $\ddagger $Edge denotes standalone ARM CPU execution without discrete GPU}{table.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-F}}Comparison with State-of-the-Art Methods}{5}{subsection.4.6}\protected@file@percent }
 \citation{rumke1985}
 \citation{sysmex2020,horiba2022}
 \citation{rumke1985}
 \citation{who2011}
 \citation{sysmex2020}
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Clinical method-comparison statistics (CLSI EP09-A3 framework) on the BCCD benchmark ($n = 364$ fields). $r$ denotes Pearson correlation, $\rho $ Spearman rank correlation, ICC(2,1) two-way random-effects intraclass correlation, BA Bias mean difference, LoA 95\% limits of agreement, and P-B / Deming regression parameters.}}{6}{table.2}\protected@file@percent }
+\newlabel{tab:agreement}{{II}{6}{Clinical method-comparison statistics (CLSI EP09-A3 framework) on the BCCD benchmark ($n = 364$ fields). $r$ denotes Pearson correlation, $\rho $ Spearman rank correlation, ICC(2,1) two-way random-effects intraclass correlation, BA Bias mean difference, LoA 95\% limits of agreement, and P-B / Deming regression parameters}{table.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Passing--Bablok regression trajectories for RBC, WBC, and Platelets. Dashed line denotes identity ($y = x$); solid line shows non-parametric fit.}}{6}{figure.5}\protected@file@percent }
+\newlabel{fig:pb_plots}{{5}{6}{Passing--Bablok regression trajectories for RBC, WBC, and Platelets. Dashed line denotes identity ($y = x$); solid line shows non-parametric fit}{figure.5}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Reliability diagram of confidence calibration on the BCCD test set ($\text  {ECE} = 0.134$).}}{6}{figure.6}\protected@file@percent }
 \newlabel{fig:calibration}{{6}{6}{Reliability diagram of confidence calibration on the BCCD test set ($\text {ECE} = 0.134$)}{figure.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-E}}Model Calibration}{6}{subsection.4.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-F}}Comparison with State-of-the-Art Methods}{6}{subsection.4.6}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Comparison with published blood smear detection architectures on BCCD. $\dagger $Evaluated on custom augmentations. $\ddagger $Edge denotes standalone ARM CPU execution without discrete GPU.}}{6}{table.3}\protected@file@percent }
+\newlabel{tab:sota_compare}{{III}{6}{Comparison with published blood smear detection architectures on BCCD. $\dagger $Evaluated on custom augmentations. $\ddagger $Edge denotes standalone ARM CPU execution without discrete GPU}{table.3}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Methodological positioning against manual differential microscopy and automated clinical analyzers. Manual values cite inter-rater studies~\cite  {rumke1985}; analyzer values cite manufacturer validation data~\cite  {sysmex2020, horiba2022}.}}{6}{table.4}\protected@file@percent }
 \newlabel{tab:analyzer_compare}{{IV}{6}{Methodological positioning against manual differential microscopy and automated clinical analyzers. Manual values cite inter-rater studies~\cite {rumke1985}; analyzer values cite manufacturer validation data~\cite {sysmex2020, horiba2022}}{table.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-G}}Benchmarking Relative to Clinical Standards}{6}{subsection.4.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {V}Discussion}{6}{section.5}\protected@file@percent }
-\newlabel{sec:discussion}{{V}{6}{Discussion}{section.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Biological Packing Density and Optical Constraints in RBC Enumeration}{6}{subsection.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Cross-Modality Disparity: Impedance vs. Optical Smears}{6}{subsection.5.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}Domain Shift and Staining Generalization}{6}{subsection.5.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}Edge Deployment and Operational Feasibility}{6}{subsection.5.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-H}}Cross-Domain Generalization and Inference Adaptation Ablation}{6}{subsection.4.8}\protected@file@percent }
+\newlabel{sec:ablation}{{\mbox  {IV-H}}{6}{Cross-Domain Generalization and Inference Adaptation Ablation}{subsection.4.8}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {V}Discussion}{7}{section.5}\protected@file@percent }
+\newlabel{sec:discussion}{{V}{7}{Discussion}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Biological Packing Density and Optical Constraints in RBC Enumeration}{7}{subsection.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Cross-Modality Disparity: Impedance vs. Optical Smears}{7}{subsection.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}Domain Shift and Staining Generalization}{7}{subsection.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}Edge Deployment and Operational Feasibility}{7}{subsection.5.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-E}}Limitations}{7}{subsection.5.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {VI}Conclusion and Future Work}{7}{section.6}\protected@file@percent }
+\newlabel{sec:conclusion}{{VI}{7}{Conclusion and Future Work}{section.6}{}}
 \bibstyle{IEEEtran}
 \bibdata{references}
 \bibcite{briggs2009}{1}
@@ -115,12 +130,13 @@
 \bibcite{breslauer2009}{16}
 \bibcite{bccd}{17}
 \bibcite{yolov8}{18}
-\bibcite{wilson1927}{19}
-\bibcite{koo2016}{20}
-\bibcite{passing1983}{21}
-\bibcite{deming1943}{22}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-E}}Limitations}{7}{subsection.5.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {VI}Conclusion and Future Work}{7}{section.6}\protected@file@percent }
-\newlabel{sec:conclusion}{{VI}{7}{Conclusion and Future Work}{section.6}{}}
-\@writefile{toc}{\contentsline {section}{References}{7}{section*.3}\protected@file@percent }
-\gdef \@abspage@last{7}
+\bibcite{reinhard2001}{19}
+\bibcite{zuiderveld1994}{20}
+\bibcite{wilson1927}{21}
+\bibcite{koo2016}{22}
+\bibcite{passing1983}{23}
+\bibcite{deming1943}{24}
+\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Ablation of generalization and inference adaptation strategies. Baseline denotes zero-shot evaluation of the original BCCD-trained model. Cells marked PENDING indicate server evaluation runs queued in the task registry.}}{8}{table.5}\protected@file@percent }
+\newlabel{tab:ablation}{{V}{8}{Ablation of generalization and inference adaptation strategies. Baseline denotes zero-shot evaluation of the original BCCD-trained model. Cells marked PENDING indicate server evaluation runs queued in the task registry}{table.5}{}}
+\@writefile{toc}{\contentsline {section}{References}{8}{section*.3}\protected@file@percent }
+\gdef \@abspage@last{8}

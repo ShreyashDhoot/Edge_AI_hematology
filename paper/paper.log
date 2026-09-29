@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.5.22)  29 SEP 2026 00:54
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.5.22)  29 SEP 2026 12:41
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -571,16 +571,20 @@ Underfull \hbox (badness 2478) in paragraph at lines 85--86
 /n/10 (+20) We
  []
 
-<figures/fig_system_architecture.pdf, id=161, 527.89218pt x 169.433pt>
+<figures/fig_system_architecture.pdf, id=173, 527.89218pt x 169.433pt>
 File: figures/fig_system_architecture.pdf Graphic file (type pdf)
 <use figures/fig_system_architecture.pdf>
 Package pdftex.def Info: figures/fig_system_architecture.pdf  used on input lin
 e 109.
 (pdftex.def)             Requested size: 516.0pt x 165.61919pt.
-[2]
-LaTeX Font Info:    Trying to load font information for T1+pcr on input line 13
-6.
- (C:\Users\admin\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\t1pcr.fd
+[2] [3 <./figures/fig_system_architecture.pdf>]
+Underfull \hbox (badness 7081) in paragraph at lines 152--153
+\T1/ptm/m/n/10 (+20) cesses each in-put at four or-thog-o-nal ro-ta-tions
+ []
+
+LaTeX Font Info:    Trying to load font information for T1+pcr on input line 15
+7.
+(C:\Users\admin\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\t1pcr.fd
 File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 )
 Package microtype Info: Loading generic protrusion settings for font family
@@ -588,57 +592,53 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 
-Underfull \hbox (badness 4108) in paragraph at lines 159--160
+Underfull \hbox (badness 4108) in paragraph at lines 180--181
 []\T1/ptm/b/n/10 (+20) Passing--Bablok and Dem-ing Re-gres-sion: \T1/ptm/m/n/10
  (+20) Non-
  []
 
-[3 <./figures/fig_system_architecture.pdf>]
-Underfull \hbox (badness 10000) in paragraph at lines 160--161
+
+Underfull \hbox (badness 10000) in paragraph at lines 181--182
 []\T1/ptm/b/n/10 (+20) Mean Ab-so-lute Per-cent-age Er-ror (MAPE):
  []
 
-<figures/fig_qualitative_detections.pdf, id=306, 510.22621pt x 212.22612pt>
+<figures/fig_qualitative_detections.pdf, id=312, 510.22621pt x 212.22612pt>
 File: figures/fig_qualitative_detections.pdf Graphic file (type pdf)
 <use figures/fig_qualitative_detections.pdf>
 Package pdftex.def Info: figures/fig_qualitative_detections.pdf  used on input 
-line 206.
+line 227.
 (pdftex.def)             Requested size: 252.0pt x 104.81746pt.
-<figures/fig_confusion_BCCD.pdf, id=308, 232.67455pt x 188.27213pt>
+<figures/fig_confusion_BCCD.pdf, id=314, 232.67455pt x 188.27213pt>
 File: figures/fig_confusion_BCCD.pdf Graphic file (type pdf)
 <use figures/fig_confusion_BCCD.pdf>
-Package pdftex.def Info: figures/fig_confusion_BCCD.pdf  used on input line 215
+Package pdftex.def Info: figures/fig_confusion_BCCD.pdf  used on input line 236
 .
 (pdftex.def)             Requested size: 221.76123pt x 179.44066pt.
-
-Overfull \hbox (1.89363pt too wide) in paragraph at lines 229--238
- [][] 
- []
-
-[4 <./figures/fig_qualitative_detections.pdf> <./figures/fig_confusion_BCCD.pdf
->]
-<figures/fig_ba_BCCD.pdf, id=416, 527.02542pt x 178.48897pt>
+[4]
+<figures/fig_ba_BCCD.pdf, id=344, 527.02542pt x 178.48897pt>
 File: figures/fig_ba_BCCD.pdf Graphic file (type pdf)
 <use figures/fig_ba_BCCD.pdf>
-Package pdftex.def Info: figures/fig_ba_BCCD.pdf  used on input line 251.
+Package pdftex.def Info: figures/fig_ba_BCCD.pdf  used on input line 272.
 (pdftex.def)             Requested size: 252.0pt x 85.34418pt.
-<figures/fig_pb_BCCD.pdf, id=419, 516.75684pt x 178.48897pt>
+ [5 <./figures/fig_qualitative_detections.pdf> <./figures/fig_confusion_BCCD.pd
+f> <./figures/fig_ba_BCCD.pdf>]
+<figures/fig_pb_BCCD.pdf, id=512, 516.75684pt x 178.48897pt>
 File: figures/fig_pb_BCCD.pdf Graphic file (type pdf)
 <use figures/fig_pb_BCCD.pdf>
-Package pdftex.def Info: figures/fig_pb_BCCD.pdf  used on input line 260.
+Package pdftex.def Info: figures/fig_pb_BCCD.pdf  used on input line 281.
 (pdftex.def)             Requested size: 252.0pt x 87.04092pt.
-<figures/fig_reliability.pdf, id=421, 227.33243pt x 213.75673pt>
+<figures/fig_reliability.pdf, id=514, 227.33243pt x 213.75673pt>
 File: figures/fig_reliability.pdf Graphic file (type pdf)
 <use figures/fig_reliability.pdf>
-Package pdftex.def Info: figures/fig_reliability.pdf  used on input line 270.
+Package pdftex.def Info: figures/fig_reliability.pdf  used on input line 291.
 (pdftex.def)             Requested size: 206.64185pt x 194.30365pt.
-LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 2
-89.
- (C:\Users\admin\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ts1ptm.fd
+LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 3
+10.
+
+(C:\Users\admin\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 )
-[5 <./figures/fig_ba_BCCD.pdf> <./figures/fig_pb_BCCD.pdf>] [6 <./figures/fig_r
-eliability.pdf>] (paper.bbl)
+[6 <./figures/fig_pb_BCCD.pdf> <./figures/fig_reliability.pdf>] [7] (paper.bbl)
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -650,22 +650,22 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[7] (paper.aux)
+[8] (paper.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-03-20>
  ***********
 Package rerunfilecheck Info: File `paper.out' has not changed.
-(rerunfilecheck)             Checksum: 052C57E25843527216749A2059457FD8;6223.
+(rerunfilecheck)             Checksum: F88E3AC520884FEC83CC5E07462E5EFD;7249.
  ) 
 Here is how much of TeX's memory you used:
- 14272 strings out of 467691
- 226469 string characters out of 5414987
- 703770 words of memory out of 5000000
- 42681 multiletter control sequences out of 15000+600000
- 762387 words of font info for 395 fonts, out of 8000000 for 9000
+ 14323 strings out of 467691
+ 227051 string characters out of 5414987
+ 710978 words of memory out of 5000000
+ 42691 multiletter control sequences out of 15000+600000
+ 765644 words of font info for 411 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,10n,79p,1522b,609s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,14n,79p,1642b,607s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
 cmex10.pfb><C:/Users/admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
 fonts/cm/cmmi10.pfb><C:/Users/admin/AppData/Local/Programs/MiKTeX/fonts/type1/p
@@ -687,9 +687,9 @@ ms/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/admin/AppData/Local/Progra
 ms/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:/Users/admin/AppData/Local/Progr
 ams/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/admin/AppData/Local/Progr
 ams/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on paper.pdf (7 pages, 1514643 bytes).
+Output written on paper.pdf (8 pages, 1527478 bytes).
 PDF statistics:
- 724 PDF objects out of 1000 (max. 8388607)
- 93 named destinations out of 1000 (max. 500000)
- 61175 words of extra memory for PDF output out of 61914 (max. 10000000)
+ 759 PDF objects out of 1000 (max. 8388607)
+ 109 named destinations out of 1000 (max. 500000)
+ 65295 words of extra memory for PDF output out of 74296 (max. 10000000)
 
