@@ -79,7 +79,7 @@ def train_yolov8(args):
             weight_decay=args.weight_decay,
             patience=args.patience,
             project_dir=args.output_dir,
-            name=args.run_name,
+            run_name=args.run_name,
             seed=args.seed,
             dropout=args.dropout,
             degrees=args.degrees,

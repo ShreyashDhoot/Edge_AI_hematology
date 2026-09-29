@@ -1,0 +1,8 @@
+path: /LAB/edge_hematology_ai/Edge_AI_hematology-main/outputs/generalized/clinical_split
+train: images/train
+val: images/val
+
+names:
+  0: RBC
+  1: WBC
+  2: Platelets

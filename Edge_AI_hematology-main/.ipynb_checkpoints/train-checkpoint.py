@@ -30,6 +30,17 @@ def parse_args():
     parser.add_argument("--weight_decay", type=float, default=5e-4)
     parser.add_argument("--patience", type=int, default=15)
     parser.add_argument("--output_dir", type=str, default="outputs/checkpoints")
+    parser.add_argument("--run_name", type=str, default="yolov8n_hematology_v2")
+    parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--dropout", type=float, default=0.1)
+    parser.add_argument("--degrees", type=float, default=180.0)
+    parser.add_argument("--flipud", type=float, default=0.5)
+    parser.add_argument("--mixup", type=float, default=0.15)
+    parser.add_argument("--copy_paste", type=float, default=0.15)
+    parser.add_argument("--close_mosaic", type=int, default=15)
+    parser.add_argument("--finetune_weights", type=str, default="")
+    parser.add_argument("--finetune_lr", type=float, default=0.001)
+    parser.add_argument("--freeze_backbone", type=int, default=10)
     return parser.parse_args()
 
 
@@ -40,15 +51,43 @@ def train_yolov8(args):
     if not os.path.exists(data_yaml):
         convert_voc_to_yolo(args.data_dir, os.path.join(args.data_dir, "yolo_format"))
         data_yaml = os.path.join(args.data_dir, "yolo_format", "data.yaml")
-    return detector.train(
-        data_yaml=data_yaml,
-        epochs=args.epochs,
-        imgsz=args.img_size,
-        batch=args.batch_size,
-        weight_decay=args.weight_decay,
-        patience=args.patience,
-        project_dir=args.output_dir
-    )
+        
+    if args.finetune_weights:
+        return detector.train_finetune(
+            weights_path=args.finetune_weights,
+            data_yaml=data_yaml,
+            epochs=args.epochs,
+            imgsz=args.img_size,
+            batch=args.batch_size,
+            patience=args.patience,
+            project_dir=args.output_dir,
+            run_name=args.run_name,
+            seed=args.seed,
+            dropout=args.dropout,
+            degrees=args.degrees,
+            flipud=args.flipud,
+            mixup=args.mixup,
+            copy_paste=args.copy_paste,
+            close_mosaic=args.close_mosaic
+        )
+    else:
+        return detector.train(
+            data_yaml=data_yaml,
+            epochs=args.epochs,
+            imgsz=args.img_size,
+            batch=args.batch_size,
+            weight_decay=args.weight_decay,
+            patience=args.patience,
+            project_dir=args.output_dir,
+            run_name=args.run_name,
+            seed=args.seed,
+            dropout=args.dropout,
+            degrees=args.degrees,
+            flipud=args.flipud,
+            mixup=args.mixup,
+            copy_paste=args.copy_paste,
+            close_mosaic=args.close_mosaic
+        )
 
 
 def train_torch_model(args):

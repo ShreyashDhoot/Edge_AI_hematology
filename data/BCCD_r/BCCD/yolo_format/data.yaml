@@ -1,0 +1,7 @@
+path: /LAB/edge_hematology_ai/data/BCCD_r/BCCD/yolo_format
+train: images/train
+val: images/val
+names:
+  0: RBC
+  1: WBC
+  2: Platelets
