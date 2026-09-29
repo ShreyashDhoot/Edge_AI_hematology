@@ -1,0 +1,27 @@
+# =========================
+
+# Dataset files
+
+# =========================
+
+# BCCD images
+
+data/BCCD_r/BCCD/JPEGImages/*
+data/BCCD_r/BCCD/yolo_format/images/*
+data/BCCD_r/BCCD/yolo_format/labels/*
+
+# BCCD annotations
+
+data/BCCD_r/BCCD/Annotations/*
+
+# Clinical dataset images
+
+data/clinical_72/images/*
+
+# Clinical annotations
+
+data/clinical_72/annotations/*
+
+# Dataset-generated caches
+
+data/**/*.cache

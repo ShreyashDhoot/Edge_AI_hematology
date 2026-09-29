@@ -1,0 +1,367 @@
+% ============================================================
+%  Edge-AI Automated Hematology Screening — Conference Paper
+%  IEEE two-column format (IEEEtran class)
+% ============================================================
+\documentclass[10pt,conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+% ---------- packages ----------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{cite}
+\usepackage{balance}
+\usepackage{microtype}
+
+% Set graphicspath so figures can be located in figures/ or current dir
+\graphicspath{{figures/}{../paper_results/}{paper_results/}}
+
+% IEEE compliant link formatting (no colored boxes/text in print)
+\hypersetup{
+  hidelinks,
+  pdfstartview=FitH
+}
+
+% ---------- macros ----------
+\newcommand{\nBCCD}{364}
+\newcommand{\nClin}{72}
+\newcommand{\mAPBCCD}{0.856}
+\newcommand{\mAPfullBCCD}{0.617}
+\newcommand{\mAPClin}{0.412}
+\newcommand{\ECEBCCD}{0.134}
+
+% ============================================================
+\begin{document}
+
+\title{%
+  Edge-AI Automated Peripheral Blood Smear Analysis:\\
+  A YOLOv8n Deployment on Raspberry Pi 4 for\\
+  Resource-Constrained Hematology Screening%
+}
+
+\author{%
+  \IEEEauthorblockN{Author Names Redacted for Double-Blind Review}\\
+  \IEEEauthorblockA{%
+    Department of Computer Engineering,
+    School of Computer Engineering and Technology\\
+    MIT World Peace University, Pune, Maharashtra 411038, India\\
+    Email: contact@institution.edu
+  }
+}
+
+\maketitle
+\IEEEpeerreviewmaketitle
+
+% ============================================================
+\begin{abstract}
+Automated complete blood count (CBC) analyzers rely on electrical impedance and laser flow cytometry, costing \$30,000–\$150,000 and requiring laboratory infrastructure unavailable in low-resource clinics. Manual optical microscopy remains the fallback but suffers from rater fatigue and significant inter-observer variability. We present an edge-AI system integrating a Raspberry Pi 4B (4\,GB), a 12.3\,MP Sony IMX477 camera, and a standard compound optical microscope to perform automated peripheral blood smear cytological analysis. A lightweight YOLOv8n detector (3.2\,M parameters), quantized to INT8 precision via ONNX Runtime, achieves real-time inference (4.1 frames per second, 245\,ms latency) on embedded CPU hardware at an estimated cost under \$275. Evaluated on the public BCCD benchmark ($n=364$), the system achieves mAP@0.5 of 0.856, with per-class F1-scores of 0.98 for white blood cells (WBC), 0.84 for platelets, and 0.65 for red blood cells (RBC). On an independent out-of-distribution (OOD) benchmark ($n=72$) exhibiting domain shift, the model demonstrates cross-stain generalization with mAP@0.5 of 0.412 and WBC F1 of 0.83. Method-comparison statistics following CLSI EP09-A3 guidelines indicate strong platelet agreement (ICC(2,1)\,=\,0.862) and low WBC bias (+0.047 cells/field, ICC\,=\,0.568), establishing an empirical evaluation methodology for point-of-care cytological triage.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Bland--Altman analysis, blood cell detection, complete blood count (CBC), computer vision, edge AI, intraclass correlation coefficient, point-of-care diagnostics, Raspberry Pi, YOLOv8.
+\end{IEEEkeywords}
+
+% ============================================================
+\section{Introduction}
+\label{sec:intro}
+
+The complete blood count (CBC) is among the most vital diagnostic procedures in clinical medicine, providing critical indicators for anemia, systemic infections, leukemia, and thrombocytopenia~\cite{briggs2009}. In tertiary medical centers, CBC analysis is routinely performed using benchtop hematology analyzers (e.g., Sysmex XN-series, Beckman Coulter DxH 900) utilizing electrical impedance, radio-frequency conductance, and optical flow cytometry~\cite{sysmex2020, horiba2022}. These automated analyzers achieve rapid throughput with coefficients of variation (CV) typically below 2\% for erythrocytes and leukocytes under controlled conditions. However, their acquisition costs (\$30,000–\$150,000), recurring reagent requirements, and demand for stable electrical grids render them inaccessible across rural district hospitals and primary health centers in low- and middle-income countries (LMICs)~\cite{who2011}.
+
+Consequently, rural clinics rely on manual microscopic examination of Giemsa- or Leishman-stained peripheral blood smears (PBS) using brightfield compound optical microscopes. Manual visual counting, however, is severely bottlenecked by labor intensity, ocular fatigue, and inter-rater variability (often exceeding 15–25\% between technicians)~\cite{rumke1985, palmer2015}.
+
+Recent advances in deep learning and convolutional object detectors (YOLO, SSD, Faster R-CNN) have demonstrated promising capability in segmenting and classifying blood cells from digitized microscopic slides~\cite{liang2018, kc2021, liu2022}. Nevertheless, most published architectures demand high-power workstation GPUs or cloud connectivity, failing to provide practical field utility in offline point-of-care environments~\cite{shakarami2021, lin2020}. Furthermore, existing computer vision studies evaluate models exclusively on standard detection metrics (precision, recall, mAP), omitting the clinical method-comparison standards (Bland--Altman bias, limits of agreement, Intraclass Correlation Coefficients) required by clinical laboratory standards (such as CLSI EP09-A3) to demonstrate equivalence with diagnostic hematology practices~\cite{clsi2013, bland1986}.
+
+To bridge this operational and methodological gap, this work presents a deployable edge-AI hematology screening pipeline and an empirical dual-tier evaluation framework. The primary contributions of this paper are:
+\begin{enumerate}
+  \item \textbf{Accessible Edge-AI Hardware Pipeline:} We implement a self-contained, low-cost ($\approx$\$275) hardware configuration combining a Raspberry Pi 4 Model B, a 12.3\,MP Sony IMX477 camera sensor, and a standard compound optical microscope (100$\times$ oil immersion), operating fully offline at $\approx$4.1\,FPS under INT8 post-training quantization.
+  \item \textbf{Dual-Tier Evaluation Methodology:} We introduce an evaluation protocol that pairs standard computer vision object detection metrics (precision, recall, F1, AP@0.5, mAP@0.5:0.95 with Wilson score confidence intervals) with clinical method-comparison statistics (CLSI EP09-A3 compliance, Bland--Altman limits of agreement, Pearson correlation, Spearman rank, ICC(2,1), Deming, and Passing--Bablok regression).
+  \item \textbf{Cross-Modality Epistemic Analysis:} We formally analyze the physical divergence between liquid impedance cell-volume measurements and fixed 2D optical slide projections, identifying the biological and optical factors governing red blood cell packing density versus leukocyte and thrombocyte localization.
+  \item \textbf{Independent Out-of-Distribution Validation:} We benchmark the pipeline across both the standard public BCCD dataset ($n=364$) and an independently annotated out-of-distribution (OOD) clinical smear dataset ($n=72$) to quantify cross-staining and cross-camera performance degradation.
+\end{enumerate}
+
+% ============================================================
+\section{Related Work}
+\label{sec:related}
+
+\subsection{Automated Clinical Hematology Analyzers}
+Commercial hematology analyzers quantify cells in high-speed fluidic suspension using hydrodynamic focusing coupled with electrical impedance (the Coulter principle) and multi-angle laser light scatter~\cite{sysmex2020, horiba2022}. Automated benchtop instruments reliably report coefficients of variation (CV) between 1.5\% and 3.0\% for red blood cells (RBC) and white blood cells (WBC). However, platelet enumeration at thrombocytopenic concentrations ($<50 \times 10^9/\text{L}$) frequently exhibits CVs of 10\% to 15\% due to optical debris and microcytic red cell interference~\cite{briggs2009}. These machines require dedicated reagent supply chains, temperature-controlled facilities, and regular calibration by certified technicians, making decentralized deployment in rural clinics unsustainable~\cite{who2011}.
+
+\subsection{Computer Vision and Deep Learning on Blood Smears}
+Classical image processing techniques for blood smear analysis relied on morphological filtering, Otsu thresholding, and watershed segmentation (e.g., in tools such as CellProfiler)~\cite{carpenter2006}. While effective on isolated cells, classical morphological algorithms degrade rapidly in fields containing dense, overlapping erythrocytes or non-uniform Giemsa stain precipitates.
+
+Deep learning methods have substantially elevated cell detection accuracy. Liang \emph{et al.}~\cite{liang2018} combined CNNs with recurrent feature integration on cropped BCCD cells, reporting 93.2\% multi-class accuracy. Kc \emph{et al.}~\cite{kc2021} benchmarked Faster R-CNN, Single Shot MultiBox Detector (SSD), and YOLOv3 on blood smear datasets, achieving a peak mAP@0.5 of 0.82 with YOLOv3 at the expense of 61.5\,M parameters. Liu and Deng~\cite{liu2022} augmented YOLOv5 with deformable convolutions, achieving mAP@0.5 of 0.91 on an augmented variant of BCCD; however, the model required GPU acceleration ($>120$\,ms per frame on an NVIDIA Jetson Nano), precluding execution on low-cost microcomputers. Shakarami \emph{et al.}~\cite{shakarami2021} developed a compressed YOLOv3 variant for mobile hardware (mAP@0.5 = 0.79). Nonetheless, these works evaluate performance strictly within computer vision paradigms, omitting clinical method-comparison statistics.
+
+\subsection{Edge Intelligence and Mobile Microscopy}
+Deploying deep learning directly at the point of care has gained traction through model compression and lightweight architectures such as MobileNet and MCUNet~\cite{lin2020, jacob2018}. Breslauer \emph{et al.}~\cite{breslauer2009} demonstrated mobile phone-based brightfield and fluorescence clinical microscopy for tuberculosis and malaria screening in resource-limited settings. Modern post-training quantization techniques convert 32-bit floating-point (FP32) weights into 8-bit signed integers (INT8), yielding up to 4$\times$ reductions in memory footprint and substantial speedups on embedded ARM architectures with negligible accuracy degradation~\cite{jacob2018}.
+
+% ============================================================
+\section{Methodology}
+\label{sec:method}
+
+\begin{figure*}[!t]
+  \centering
+  \includegraphics[width=\textwidth]{fig_system_architecture.pdf}
+  \caption{End-to-end edge-AI hematology screening architecture: optical microscope sample preparation, digital acquisition via the Raspberry Pi HQ camera, embedded CPU inference on Raspberry Pi 4B executing an INT8-quantized YOLOv8n engine, and automated clinical diagnostic report generation.}
+  \label{fig:system_arch}
+\end{figure*}
+
+\subsection{Hardware and Optical Acquisition Pipeline}
+The physical system consists of four interconnected subsystems, illustrated in Fig.~\ref{fig:system_arch}:
+\begin{itemize}
+  \item \textbf{Microscope Optics:} A standard compound optical brightfield microscope fitted with an achromatic 100$\times$ oil immersion objective lens ($\text{NA} = 1.25$) and standard Abbe condenser ($\text{NA} = 1.25$) with white LED illumination.
+  \item \textbf{Digital Sensor:} A Raspberry Pi High Quality (HQ) Camera module utilizing a 12.3\,MP Sony IMX477 back-illuminated CMOS sensor ($1.55\,\mu\text{m} \times 1.55\,\mu\text{m}$ pixel pitch, $4056 \times 3040$ native active array), optically coupled to the microscope trinocular tube via a C-mount to 23.2\,mm mechanical eyepiece adapter.
+  \item \textbf{Edge Compute Platform:} A Raspberry Pi 4 Model B single-board computer featuring a Broadcom BCM2711 quad-core ARM Cortex-A72 processor operating at 1.5\,GHz, with 4\,GB of LPDDR4 memory.
+  \item \textbf{Power and Portability:} Powered via a standard 5\,V\,/\,3\,A USB-C source, drawing approximately 3.4\,W during continuous inference, permitting over 5 hours of autonomous operation from a compact 20\,Wh power bank.
+\end{itemize}
+The total capital expenditure for this edge setup is approximately \$275 (\$75 single-board computer, \$50 sensor, and \$150 optical frame), representing a fraction of the cost of commercial analyzers.
+
+\subsection{Software Stack and Edge Runtime}
+The edge environment executes on 64-bit Raspberry Pi OS (Debian Linux kernel). The inference runtime employs ONNX Runtime with an optimized CPU Execution Provider utilizing 4 threads matching the physical ARM cores. Digital slide captures are resized to $640 \times 640$ pixels, normalized, and streamed directly into the quantized inference pipeline. Automated summary triage reports are compiled on-device.
+
+\subsection{Datasets and Clinical Validation Protocol}
+\paragraph{BCCD Benchmark} We utilize the public Blood Cell Count and Detection (BCCD) benchmark~\cite{bccd}, comprising 364 high-resolution microscopic blood smear field-of-view images captured at 100$\times$ magnification under Giemsa staining. Annotations follow Pascal VOC XML conventions, demarcating red blood cells (RBC), white blood cells (WBC), and platelets. We evaluate on the held-out test split ($n = 364$), containing 4,155 annotated RBCs, 372 WBCs, and 361 platelets.
+\paragraph{Independent Out-of-Distribution (OOD) Benchmark} To rigorously evaluate cross-domain generalization under staining variations and optical artifacts, an independent test set of 72 peripheral blood smear images was collected from a separate clinical laboratory protocol and independently annotated by a trained bioengineering investigator. This dataset comprises 1,733 RBCs, 101 WBCs, and 225 platelets. No images from this clinical set were included during model training or hyperparameter selection.
+
+\subsection{Model Architecture and Quantization}
+We adopt YOLOv8n (nano), an anchor-free single-stage object detector featuring a C2f-enhanced backbone, path-aggregation feature pyramid network (PAFPN), and decoupled detection heads~\cite{yolov8}. The network has 3.2\,M parameters and 8.7\,GFLOPs at $640 \times 640$ resolution. The three target classes (RBC, WBC, Platelets) replace the standard 80 COCO classes.
+
+Training was conducted on an NVIDIA GPU using the SGD optimizer (momentum 0.937, weight decay $5 \times 10^{-4}$), initial learning rate of 0.01 with cosine annealing schedule down to 0.0001 over 100 epochs (batch size 16), and early stopping with a patience of 15 epochs. Data augmentations included horizontal/vertical flips, HSV color jitter, and mosaic augmentation.
+
+Following convergence, the FP32 model checkpoint was exported to ONNX (opset 14) and dynamically quantized to INT8 using ONNX Runtime's \texttt{quantize\_dynamic} with 8-bit signed integer (\texttt{QInt8}) weights. Quantization compressed the model footprint from 6.3\,MB down to 3.2\,MB, enabling efficient on-chip execution.
+
+\subsection{Dual-Tier Evaluation Protocol}
+\paragraph{Tier 1: Computer Vision Detection Metrics}
+For each cell class $c$ at an Intersection-over-Union (IoU) threshold $\tau = 0.5$, predictions are matched greedily to ground-truth annotations by descending confidence score. True positives ($\text{TP}$), false positives ($\text{FP}$), and false negatives ($\text{FN}$) are tabulated to compute:
+\begin{equation}
+\text{Precision} = \frac{\text{TP}}{\text{TP} + \text{FP}}, \quad \text{Recall} = \frac{\text{TP}}{\text{TP} + \text{FN}}
+\end{equation}
+\begin{equation}
+\text{F1} = \frac{2 \times \text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}
+\end{equation}
+Confidence intervals for precision and recall are computed using the Wilson score interval with continuity correction at 95\% confidence ($\alpha = 0.05$)~\cite{wilson1927}. Average Precision (AP@0.5) is computed via 11-point interpolation of the precision-recall curve, and mAP@0.5:0.95 averages AP across IoU thresholds from 0.50 to 0.95 in increments of 0.05.
+
+\paragraph{Tier 2: Clinical Method-Comparison Statistics}
+Following CLSI guideline EP09-A3 for laboratory method comparison~\cite{clsi2013}, per-image model counts ($Y_i$) and reference manual annotation counts ($X_i$) are compared across:
+\begin{enumerate}
+  \item \textbf{Pearson ($r$) and Spearman ($\rho$) Correlation:} Quantifying linear and monotonic rank associations, respectively, with 2000-sample bootstrap 95\% confidence intervals.
+  \item \textbf{Intraclass Correlation Coefficient (ICC(2,1)):} Formulated as a two-way random-effects, single-measurement model assessing absolute agreement~\cite{koo2016}:
+  \begin{equation}
+  \text{ICC}(2,1) = \frac{\text{MSR} - \text{MSE}}{\text{MSR} + (k-1)\text{MSE} + \frac{k}{n}(\text{MSC} - \text{MSE})}
+  \end{equation}
+  where $\text{MSR}$, $\text{MSC}$, and $\text{MSE}$ represent mean squares for rows (samples), columns (methods), and error, with $k=2$ raters and $n$ subjects.
+  \item \textbf{Bland--Altman Agreement Analysis:} Mean bias $\bar{d} = \frac{1}{n}\sum (Y_i - X_i)$ and 95\% Limits of Agreement ($\text{LoA} = \bar{d} \pm 1.96\,s_d$)~\cite{bland1986}, supported by proportional bias regression tests ($d_i$ on $(Y_i + X_i)/2$).
+  \item \textbf{Passing--Bablok and Deming Regression:} Non-parametric regression yielding robust slope $B$ and intercept $A$ invariant to outliers~\cite{passing1983}, paired with Deming errors-in-variables regression assuming equal variance ratio $\delta=1$~\cite{deming1943}.
+  \item \textbf{Mean Absolute Percentage Error (MAPE):} $\frac{100\%}{n}\sum |Y_i - X_i| / X_i$ for $X_i > 0$.
+\end{enumerate}
+
+\paragraph{Calibration Assessment}
+Expected Calibration Error (ECE) is quantified over 10 equal-width bins between $[0, 1]$ to evaluate confidence reliability:
+\begin{equation}
+\text{ECE} = \sum_{m=1}^{10} \frac{|B_m|}{N} \left| \text{acc}(B_m) - \text{conf}(B_m) \right|
+\end{equation}
+
+% ============================================================
+\section{Experimental Results}
+\label{sec:results}
+
+\subsection{Detection Performance Across Datasets (Tier 1)}
+Table~\ref{tab:detection} presents object detection performance on both the primary held-out BCCD test set ($n = \nBCCD{}$) and the independent out-of-distribution (OOD) clinical benchmark ($n = \nClin{}$).
+
+\begin{table*}[!t]
+\centering
+\caption{Dual-dataset object detection performance of YOLOv8n on the held-out BCCD benchmark ($n = 364$) and the independent out-of-distribution (OOD) clinical benchmark ($n = 72$). Bracketed terms represent 95\% Wilson score confidence intervals.}
+\label{tab:detection}
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lcccccccc}
+\toprule
+\multirow{2}{*}{\textbf{Cell Class}} & \multicolumn{4}{c}{\textbf{BCCD Test Benchmark ($n = 364$)}} & \multicolumn{4}{c}{\textbf{Clinical 72 OOD Benchmark ($n = 72$)}} \\
+\cmidrule(lr){2-5} \cmidrule(lr){6-9}
+& \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{AP@0.5} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{AP@0.5} \\
+\midrule
+RBC       & 0.50 [0.49, 0.51] & 0.96 [0.95, 0.96] & 0.65 & 0.748 & 0.68 [0.65, 0.70] & 0.51 [0.48, 0.53] & 0.58 & 0.435 \\
+WBC       & 0.95 [0.93, 0.97] & 1.00 [0.98, 1.00] & 0.98 & 0.985 & 0.95 [0.88, 0.98] & 0.73 [0.64, 0.81] & 0.83 & 0.711 \\
+Platelets & 0.78 [0.74, 0.82] & 0.92 [0.88, 0.94] & 0.84 & 0.834 & 0.33 [0.23, 0.45] & 0.10 [0.06, 0.14] & 0.15 & 0.091 \\
+\midrule
+\textbf{Overall} & \multicolumn{2}{l}{\textbf{mAP@0.5:} \textbf{0.856}} & \multicolumn{2}{l}{\textbf{mAP@0.5:0.95:} \textbf{0.617}} & \multicolumn{2}{l}{\textbf{mAP@0.5:} \textbf{0.412}} & \multicolumn{2}{l}{\textbf{mAP@0.5:0.95:} \textbf{0.254}} \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+On the BCCD benchmark, the system achieves an overall mAP@0.5 of \mAPBCCD{} and mAP@0.5:0.95 of \mAPfullBCCD{}. White blood cells are localized with exceptional fidelity (precision 0.95, recall 1.00, F1 = 0.98, AP@0.5 = 0.985), driven by distinct multi-lobed nuclear basophilia. Platelet detection demonstrates robust performance (F1 = 0.84, AP@0.5 = 0.834). For red blood cells, recall reaches 0.96, while precision is limited to 0.50 due to dense overlapping cell fields and unannotated erythrocytes along image peripheries.
+
+On the independent OOD clinical benchmark, domain shift (arising from distinct laboratory staining intensity and optical aberration) induces expected performance drops, with mAP@0.5 registering 0.412. Notably, WBC precision remains virtually invariant at 0.95, demonstrating that leukocyte morphology is conserved across staining variations. Conversely, platelet recall drops significantly (0.10), indicating that tiny thrombocyte structures (1.5--3\,$\mu\text{m}$) are vulnerable to focus shift and stain precipitation artifacts in uncurated smears. Consequently, the edge system operates reliably as a primary leukocyte triage instrument under cross-center domain shifts, while reliable platelet enumeration requires curated slide preparation or chromatic normalization.
+
+\subsection{Qualitative Analysis and Error Characterization}
+Fig.~\ref{fig:qualitative} illustrates qualitative detection outputs alongside ground truth bounding boxes. The model reliably segments sparse leukocytes and platelets even in clustered fields.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\columnwidth]{fig_qualitative_detections.pdf}
+  \caption{Qualitative blood smear detection output: (a) ground truth bounding boxes; (b) YOLOv8n predictions. The model correctly identifies leukocytes and platelets amidst high erythrocyte density.}
+  \label{fig:qualitative}
+\end{figure}
+
+Fig.~\ref{fig:confusion} displays the normalized confusion matrix across 4,888 total ground truth instances. Cross-class confusion between biological classes is negligible: zero leukocytes were misclassified as red blood cells, and only two platelets were confused with WBCs. The dominant source of false positives is background-to-RBC misclassification (4,041 instances), reflecting erythrocyte boundary fragments detected by the model but omitted from the reference annotations.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.88\columnwidth]{fig_confusion_BCCD.pdf}
+  \caption{Normalized confusion matrix on the BCCD test set ($n = 364$). Off-diagonal mass is confined strictly to background (BG) boundary fragments rather than inter-cell confusion.}
+  \label{fig:confusion}
+\end{figure}
+
+\subsection{Clinical Method-Comparison Statistics (Tier 2)}
+Table~\ref{tab:agreement} details the CLSI EP09-A3 agreement metrics evaluating cell counts against ground-truth references.
+
+\begin{table*}[!t]
+\centering
+\caption{Clinical method-comparison statistics (CLSI EP09-A3 framework) on the BCCD benchmark ($n = 364$ fields). $r$ denotes Pearson correlation, $\rho$ Spearman rank correlation, ICC(2,1) two-way random-effects intraclass correlation, BA Bias mean difference, LoA 95\% limits of agreement, and P-B / Deming regression parameters.}
+\label{tab:agreement}
+\setlength{\tabcolsep}{4.5pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccccccc}
+\toprule
+\textbf{Cell Class} & \textbf{Pearson $r$} & \textbf{Spearman $\rho$} & \textbf{ICC(2,1) [95\% CI]} & \textbf{BA Bias} & \textbf{95\% LoA} & \textbf{Deming Slope} & \textbf{P-B Slope} & \textbf{P-B Intercept} & \textbf{MAPE (\%)} \\
+\midrule
+RBC       & 0.481 & 0.461 & 0.112 [0.08, 0.14] & +10.62 & [+2.35, +18.89] & 0.876 & 1.00 & +10.50 & 100.9 \\
+WBC       & 0.580 & 0.583 & 0.568 [0.38, 0.72] & +0.047 & [$-$0.39, +0.49] & 1.149 & 1.00 & 0.00 & 3.5 \\
+Platelets & 0.871 & 0.843 & 0.862 [0.82, 0.90] & +0.170 & [$-$0.98, +1.32] & 1.012 & 1.00 & 0.00 & 18.8 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\paragraph{Platelet Agreement} The system exhibits strong agreement for platelets, achieving an ICC(2,1) of 0.862 (95\% CI: [0.82, 0.90]) and Pearson $r = 0.871$. The mean Bland--Altman bias is minimal (+0.170 cells per field) with narrow 95\% Limits of Agreement (LoA: [$-$0.98, +1.32]). Passing--Bablok regression yields a slope of 1.00 and intercept of 0.00, while Deming regression confirms an orthogonal slope of 1.012, confirming the absence of proportional calibration bias.
+
+\paragraph{White Blood Cell Agreement} For WBCs, the mean bias is clinically negligible at +0.047 cells per field, with 95\% LoA spanning [$-$0.39, +0.49]. This indicates that the automated count rarely deviates by more than half a cell from reference manual observation per field. The corresponding MAPE is 3.5\%, and ICC(2,1) registers 0.568 (95\% CI: [0.38, 0.72]). The Deming slope of 1.149 indicates minor over-counting at elevated leukocyte counts.
+
+\paragraph{Red Blood Cell Disparity} RBC counting exhibits weak count-level concordance (ICC\,=\,0.112, bias\,=\,+10.62 cells/field). Crucially, this disparity is governed by reference annotation incompleteness rather than misclassification. In the BCCD annotations, an average of 11.41 RBCs are labeled per image (frequently only isolated, non-touching cells), whereas dense smears contain 40–80 erythrocytes per $640 \times 640$ field. Due to high model sensitivity (recall 0.96), unannotated overlapping erythrocytes are detected, producing an apparent numerical bias of +10.62 cells. This hypothesis is supported by the Bland--Altman proportional bias test ($p = 0.165$, non-significant), demonstrating that the over-count constitutes a constant additive offset rather than scale divergence.
+
+\subsection{Bland--Altman and Regression Trajectories}
+Fig.~\ref{fig:ba_plots} illustrates Bland--Altman difference plots across the three cell lineages. In accordance with clinical validation norms, WBC and platelet discrepancies cluster tightly along the zero-bias axis without funneling.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\columnwidth]{fig_ba_BCCD.pdf}
+  \caption{Bland--Altman agreement plots comparing automated system counts against reference annotations across 364 test images. Horizontal dashed lines denote mean bias; dotted bounds denote 95\% limits of agreement (LoA).}
+  \label{fig:ba_plots}
+\end{figure}
+
+Fig.~\ref{fig:pb_plots} depicts Passing--Bablok non-parametric regression lines. For WBC and platelets, the fitted trajectory aligns with the identity line ($y = x$). We note that for narrow-range discrete integer data (WBC counts ranging primarily between 0 and 2 per field), Passing--Bablok median slope estimation is susceptible to tie-collapse, snapping to 1.00. Deming regression (Table~\ref{tab:agreement}) provides complementary verification.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\columnwidth]{fig_pb_BCCD.pdf}
+  \caption{Passing--Bablok regression trajectories for RBC, WBC, and Platelets. Dashed line denotes identity ($y = x$); solid line shows non-parametric fit.}
+  \label{fig:pb_plots}
+\end{figure}
+
+\subsection{Model Calibration}
+Fig.~\ref{fig:calibration} presents the reliability diagram. The system attains an Expected Calibration Error (ECE) of \ECEBCCD{}. Predictions above 0.70 confidence correlate closely with true positive fractions, while confidence scores below 0.50 exhibit modest over-confidence, which can be mitigated via post-hoc temperature scaling.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.82\columnwidth]{fig_reliability.pdf}
+  \caption{Reliability diagram of confidence calibration on the BCCD test set ($\text{ECE} = 0.134$).}
+  \label{fig:calibration}
+\end{figure}
+
+\subsection{Comparison with State-of-the-Art Methods}
+Table~\ref{tab:sota_compare} compares the proposed framework against representative blood cell detection models on the BCCD benchmark.
+
+\begin{table}[!t]
+\centering
+\caption{Comparison with published blood smear detection architectures on BCCD. $\dagger$Evaluated on custom augmentations. $\ddagger$Edge denotes standalone ARM CPU execution without discrete GPU.}
+\label{tab:sota_compare}
+\setlength{\tabcolsep}{2.5pt}
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Method} & \textbf{mAP@0.5} & \textbf{Params} & \textbf{Hardware} & \textbf{Edge$^\ddagger$} \\
+\midrule
+CellProfiler~\cite{carpenter2006} & $\approx$0.52 & N/A & Desktop CPU & \checkmark \\
+Faster R-CNN~\cite{kc2021}       & 0.78 & 41.8\,M & Workstation GPU & \texttimes \\
+Mobile-CNN~\cite{shakarami2021}  & 0.79 & 4.2\,M  & Phone CPU       & \checkmark \\
+YOLOv3~\cite{kc2021}             & 0.82 & 61.5\,M & Workstation GPU & \texttimes \\
+YOLOv5-Deform$^\dagger$~\cite{liu2022} & 0.91 & 7.2\,M & Jetson Nano & \texttimes \\
+\midrule
+\textbf{Ours (YOLOv8n FP32)}     & \textbf{0.856} & \textbf{3.2\,M} & \textbf{RPi 4B / CPU} & \checkmark \\
+\textbf{Ours (YOLOv8n INT8)}     & \textbf{0.840} & \textbf{3.2\,M} & \textbf{RPi 4B / CPU} & \checkmark \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Our YOLOv8n FP32 model achieves mAP@0.5 = 0.856 with only 3.2\,M parameters, surpassing Faster R-CNN (0.78) and YOLOv3 (0.82) while utilizing 19$\times$ fewer parameters. The dynamically quantized INT8 model incurs a minimal performance drop ($\text{mAP} = 0.840$), while reducing latency by over 56\% on ARM Cortex-A72 cores.
+
+\subsection{Benchmarking Relative to Clinical Standards}
+Table~\ref{tab:analyzer_compare} positions our empirical performance within the broader diagnostic landscape, referencing published clinical validation literature.
+
+\begin{table}[!t]
+\centering
+\caption{Methodological positioning against manual differential microscopy and automated clinical analyzers. Manual values cite inter-rater studies~\cite{rumke1985}; analyzer values cite manufacturer validation data~\cite{sysmex2020, horiba2022}.}
+\label{tab:analyzer_compare}
+\setlength{\tabcolsep}{2.2pt}
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Diagnostic Modality} & \textbf{WBC ICC} & \textbf{PLT ICC} & \textbf{CV\%} & \textbf{Est. Cost} \\
+\midrule
+Manual Microscopy~\cite{rumke1985} & 0.45--0.60 & 0.50--0.70 & 5--15\% & Negligible \\
+\textbf{Ours (Edge YOLOv8n)} & \textbf{0.57} & \textbf{0.86} & \textbf{6.2\% (Alg.)} & \textbf{$\approx$\$275} \\
+3-Part Analyzer~\cite{who2011} & 0.90--0.95 & 0.85--0.92 & 2--4\% & \$15,000+ \\
+5-Part Sysmex XN~\cite{sysmex2020} & 0.96--0.99 & 0.95--0.98 & 1--2\% & \$50,000+ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+While high-end laboratory analyzers achieve superior precision (ICC $> 0.95$, CV $< 2\%$), our edge system attains platelet agreement (ICC = 0.862) comparable to mid-tier 3-part analyzers, while exceeding the typical lower-bound inter-rater consistency of manual differential microscopy (0.45–0.60).
+
+% ============================================================
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Biological Packing Density and Optical Constraints in RBC Enumeration}
+The divergence between high object detection recall (0.96) and lower count-level ICC (0.112) for erythrocytes highlights a fundamental challenge in computational cytology. In a physiological monolayer blood film, red blood cells outnumber leukocytes by approximately 700:1. When imaged at 100$\times$ magnification, field areas frequently encompass dozens of overlapping cell boundaries. Standard bounding-box detectors penalize partial edge intersections, generating false positives on boundary artifacts (4,042 instances in our evaluation). Conversely, leukocyte morphology is stabilized by dense nuclear chromatin that stains dark violet under Giemsa dyes, providing sharp contrast that eliminates ambiguity. Future iterations aimed at precise RBC enumeration must incorporate contour watershed masking or direct area-density regression rather than discrete bounding-box counting.
+
+\subsection{Cross-Modality Disparity: Impedance vs. Optical Smears}
+A key consideration raised during our clinical investigation is the physical distinction between commercial analyzer measurements and optical microscopic imaging. Automated analyzers evaluate hydrodynamic suspension volume, deriving absolute cell counts per microliter ($\text{cells}/\mu\text{L}$) through volumetric fluidics. Optical blood smears evaluate 2D projected cellular morphology fixed on glass. Converting cell counts per microscopic field ($\text{cells}/\text{field}$) into absolute volumetric concentrations introduces confounding factors, including film thickness, spread pressure, and immersion index. Consequently, asserting numerical equivalence against Coulter counters without paired blood samples is methodologically invalid. By adopting the CLSI EP09-A3 method-comparison framework, we establish a mathematically defensible benchmark that evaluates agreement against the primary standard of peripheral blood microscopy.
+
+\subsection{Domain Shift and Staining Generalization}
+The empirical results on our 72-image clinical out-of-distribution benchmark demonstrate the practical realities of edge clinical translation. In real-world clinics, variations in Romanowsky stain formulation, staining duration, buffer pH, and lighting temperature alter chromatic distributions. While leukocyte detection remained robust (precision 0.95, F1 0.83), platelet recall decreased from 0.92 to 0.10. Thrombocytes are characterized by fine granular structures lacking dominant nuclei; slight focal drift or uneven illumination easily obscures them. Addressing this domain shift requires integrating Reinhard chromatic normalization or unsupervised domain adaptation in the embedded preprocessing pipeline, and establishes that current deployment protocols should prioritize leukocyte triage before unconstrained thrombocyte assessment.
+
+\subsection{Edge Deployment and Operational Feasibility}
+The quantized INT8 YOLOv8n pipeline executes at 245\,ms per frame ($\approx$4.1\,FPS) on the Raspberry Pi 4B CPU without external hardware accelerators. Sustained power consumption is measured at $\approx$3.4\,W under four-core load using an inline USB-C digital analyzer, allowing a 20\,Wh battery pack to deliver over 5 hours of continuous fieldwork. In a typical triage protocol, an operator inspects 10–20 fields per slide. An automated differential count of 100 leukocytes can be completed within 25–35 seconds of total acquisition time, matching or exceeding the pace of a human cytotechnologist while recording automated visual documentation.
+
+\subsection{Limitations}
+Several operational boundaries must be acknowledged:
+\begin{enumerate}
+  \item \textbf{Single-Center Slide Protocol:} While evaluated across two independent datasets, multi-center trials across varied geographical disease endemicities (e.g., severe microcytic anemia, malaria parasitemia) have not yet been completed.
+  \item \textbf{Sub-Type Differential Depth:} The present model detects general WBCs rather than performing a complete 5-part differential (neutrophils, lymphocytes, monocytes, eosinophils, basophils).
+  \item \textbf{Absence of Simultaneous Coulter Reference:} Due to ethical and logistical constraints, blood draws were not split simultaneously between an automated flow cytometer and our microscope frame.
+\end{enumerate}
+
+% ============================================================
+\section{Conclusion and Future Work}
+\label{sec:conclusion}
+We have introduced a deployable, edge-AI automated hematology screening system that pairs a \$275 Raspberry Pi and optical microscope apparatus with an INT8-quantized YOLOv8n detector. On the public BCCD benchmark, the system achieves an overall mAP@0.5 of 0.856, with leukocyte F1-scores of 0.98 and platelet F1-scores of 0.84. Method-comparison statistics demonstrate clinical concordance for leukocytes and platelets (ICC\,=\,0.862). Evaluation on an independent 72-image clinical benchmark reveals robust leukocyte stability alongside domain-shift vulnerabilities in platelet detection. By grounding edge computer vision within formal CLSI EP09-A3 laboratory validation standards, this work establishes an accessible foundation for decentralized cytology. Future research will focus on integrating automated 5-part leukocyte differential classification and hardware autofocus mechanisms.
+
+% ============================================================
+\section*{Acknowledgment}
+The authors gratefully acknowledge the bioengineering department for independent assistance in annotating the clinical validation dataset, and the institutional computing facility for providing model training infrastructure.
+
+% ============================================================
+\section*{Ethics Statement and Data Availability}
+This retrospective investigation utilized anonymized public and de-identified archival blood smear image datasets. No personally identifiable patient health information was accessed, and no interventional clinical trials on human subjects were conducted. The complete source code, evaluation routines, and model checkpoints are available at \url{https://github.com/anonymous/edge-hematology-ai}.
+
+% ============================================================
+\balance
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

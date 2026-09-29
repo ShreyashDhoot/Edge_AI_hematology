@@ -1,0 +1,101 @@
+{
+  "model_name": "Test_YOLOv8n",
+  "cv_detection_metrics": {
+    "RBC": {
+      "precision": 0.2916053019145803,
+      "recall": 0.2916053019145803,
+      "f1": 0.29160525191458886,
+      "ap": 0.09294732539763334,
+      "n_gt": 1358
+    },
+    "WBC": {
+      "precision": 0.3617021276595745,
+      "recall": 0.3617021276595745,
+      "f1": 0.36170207765958146,
+      "ap": 0.1765151515151515,
+      "n_gt": 47
+    },
+    "Platelets": {
+      "precision": 0.2975206611570248,
+      "recall": 0.2975206611570248,
+      "f1": 0.29752061115703327,
+      "ap": 0.09527580433503778,
+      "n_gt": 121
+    },
+    "mAP@0.5": 0.12157942708260755
+  },
+  "clinical_equivalence_metrics": {
+    "RBC": {
+      "bland_altman": {
+        "mean_bias": 0.0,
+        "sd_diff": 0.0,
+        "upper_loa_95": 0.0,
+        "lower_loa_95": 0.0,
+        "pct_within_loa": 100.0,
+        "sample_size": 25
+      },
+      "passing_bablok": {
+        "slope": 1.0,
+        "intercept": 0.0,
+        "proportional_bias_detected": false,
+        "constant_bias_detected": false
+      },
+      "correlation": {
+        "pearson_r": 0.9999999999999999,
+        "pearson_p_value": 0.0,
+        "spearman_rho": 1.0,
+        "spearman_p_value": 0.0,
+        "mae": 0.0,
+        "mape_percent": 0.0
+      }
+    },
+    "WBC": {
+      "bland_altman": {
+        "mean_bias": 0.0,
+        "sd_diff": 0.0,
+        "upper_loa_95": 0.0,
+        "lower_loa_95": 0.0,
+        "pct_within_loa": 100.0,
+        "sample_size": 25
+      },
+      "passing_bablok": {
+        "slope": 1.0,
+        "intercept": 0.0,
+        "proportional_bias_detected": false,
+        "constant_bias_detected": false
+      },
+      "correlation": {
+        "pearson_r": 0.9999999999999998,
+        "pearson_p_value": 4.594778479182708e-178,
+        "spearman_rho": 1.0,
+        "spearman_p_value": 0.0,
+        "mae": 0.0,
+        "mape_percent": 0.0
+      }
+    },
+    "Platelets": {
+      "bland_altman": {
+        "mean_bias": 0.0,
+        "sd_diff": 0.0,
+        "upper_loa_95": 0.0,
+        "lower_loa_95": 0.0,
+        "pct_within_loa": 100.0,
+        "sample_size": 25
+      },
+      "passing_bablok": {
+        "slope": 1.0,
+        "intercept": 0.0,
+        "proportional_bias_detected": false,
+        "constant_bias_detected": false
+      },
+      "correlation": {
+        "pearson_r": 0.9999999999999998,
+        "pearson_p_value": 4.594778479182708e-178,
+        "spearman_rho": 1.0,
+        "spearman_p_value": 0.0,
+        "mae": 0.0,
+        "mape_percent": 0.0
+      }
+    }
+  }
+}

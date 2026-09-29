@@ -1,0 +1,101 @@
+{
+  "model_name": "YOLOv8n_Clinical72",
+  "cv_detection_metrics": {
+    "RBC": {
+      "precision": 0.6759045419553503,
+      "recall": 0.5066358915175996,
+      "f1": 0.5791556238476739,
+      "ap": 0.4346139248326013,
+      "n_gt": 1733
+    },
+    "WBC": {
+      "precision": 0.9487179487179487,
+      "recall": 0.7326732673267327,
+      "f1": 0.8268155932836083,
+      "ap": 0.7105263157894737,
+      "n_gt": 101
+    },
+    "Platelets": {
+      "precision": 0.3283582089552239,
+      "recall": 0.09777777777777778,
+      "f1": 0.15068489614609573,
+      "ap": 0.09090909090909091,
+      "n_gt": 225
+    },
+    "mAP@0.5": 0.41201644384372194
+  },
+  "clinical_equivalence_metrics": {
+    "RBC": {
+      "bland_altman": {
+        "mean_bias": -6.027777777777778,
+        "sd_diff": 5.032212355352104,
+        "upper_loa_95": 3.835358438712345,
+        "lower_loa_95": -15.890913994267901,
+        "pct_within_loa": 98.61111111111111,
+        "sample_size": 72
+      },
+      "passing_bablok": {
+        "slope": 0.25,
+        "intercept": 12.125,
+        "proportional_bias_detected": true,
+        "constant_bias_detected": true
+      },
+      "correlation": {
+        "pearson_r": 0.2966332934651533,
+        "pearson_p_value": 0.011400026042829026,
+        "spearman_rho": 0.2572075986212684,
+        "spearman_p_value": 0.029174480195314097,
+        "mae": 6.583333333333333,
+        "mape_percent": 26.127253560749452
+      }
+    },
+    "WBC": {
+      "bland_altman": {
+        "mean_bias": -0.3194444444444444,
+        "sd_diff": 0.7473217699599184,
+        "upper_loa_95": 1.1453062246769956,
+        "lower_loa_95": -1.7841951135658844,
+        "pct_within_loa": 93.05555555555556,
+        "sample_size": 72
+      },
+      "passing_bablok": {
+        "slope": 0.0,
+        "intercept": 1.0,
+        "proportional_bias_detected": true,
+        "constant_bias_detected": false
+      },
+      "correlation": {
+        "pearson_r": 0.4080794093474018,
+        "pearson_p_value": 0.00037325048313178164,
+        "spearman_rho": 0.4998716849100588,
+        "spearman_p_value": 7.801231349385647e-06,
+        "mae": 0.3194444444444444,
+        "mape_percent": 11.412037037037038
+      }
+    },
+    "Platelets": {
+      "bland_altman": {
+        "mean_bias": -2.1944444444444446,
+        "sd_diff": 4.211449480792151,
+        "upper_loa_95": 6.059996537908171,
+        "lower_loa_95": -10.44888542679706,
+        "pct_within_loa": 91.66666666666666,
+        "sample_size": 72
+      },
+      "passing_bablok": {
+        "slope": 0.0,
+        "intercept": 1.0,
+        "proportional_bias_detected": true,
+        "constant_bias_detected": false
+      },
+      "correlation": {
+        "pearson_r": 0.011588476894185323,
+        "pearson_p_value": 0.923033129615603,
+        "spearman_rho": 0.23947470500466692,
+        "spearman_p_value": 0.04276166579065508,
+        "mae": 2.5555555555555554,
+        "mape_percent": 69.16854557479559
+      }
+    }
+  }
+}
