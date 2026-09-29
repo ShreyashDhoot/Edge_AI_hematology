@@ -4,6 +4,21 @@
 **Repository:** Edge_AI_hematology-main  
 **Branch:** `improve/autonomous`  
 
+## Run 2 Start State (2026-09-29)
+
+- **Loop Status:** Round 1 and Round 2 critiques completed. Round 1 issues R1-C01 through R1-C22 processed.
+- **Ledger Status:** 20/22 items marked Done; R1-C02 awaiting paired human server results; R1-C04 empirical mAP integrated.
+- **Round 2 Critiques:** Both `critique.md` (Prof. [Guide]) and `critique-2.md` (Adversarial) acknowledge substantial improvement and scientific honesty, noting remaining weaknesses:
+  1. OOD clinical platelet collapse (AP@0.5 = 0.091, Recall = 0.098) requires explicit bounding as leukocyte-primary triage or stain normalization.
+  2. Single seed variance (seed=0) without multi-seed confidence bounds.
+  3. Server tasks T-01 to T-05 pending server execution.
+- **New Code / Pipeline Status:** Code was modified in `Edge_AI_hematology-main/` to introduce generalization features (rotation 180°, flipud 0.5, mixup 0.15, copy-paste 0.15, dropout 0.1, stain normalization, 4-rotation TTA, per-class thresholding, and clinical split fine-tuning), documented in `change.md`.
+- **Pipeline Execution & Results Status:**
+  - On the remote server, initial execution of `retrain_and_evaluate.py` encountered an OpenCV headless library issue (`libxcb.so.1`) and CLI argument mismatch which were fixed. The remote server has not yet completed full retraining and evaluation across all clinical sets.
+  - A local preliminary run exists in `Edge_AI_hematology-main/outputs/generalized/` evaluating BCCD test set only (`n_clin=0` because clinical data is on server). Crucially, the retrained model `b_v2_bccd` shows an empirical drop in in-domain BCCD mAP@0.5 from 0.856 to 0.581, with platelet AP@0.5 collapsing from 0.834 to 0.005 under heavy unguided augmentations.
+  - No valid, complete cross-domain evaluation results from the new pipeline exist yet.
+  - Per the non-negotiable rules: baseline numbers remain untouched; the paper is updated to reflect the new pipeline and methods factually; all new results remain marked `PENDING`.
+
 ---
 
 ## Issue Registry (Round 1)

@@ -1,0 +1,148 @@
+(PBL) root@05ffe21980dd:/LAB/edge_hematology_ai# ls -R
+.:
+'Comparison_Metrics_Notes (1).docx'   Edge_AI_hematology.pdf   SERVER_TASKS.md   critiques   improvements   paper_backup_original   server
+ Edge_AI_hematology-main              MORNING_HANDOFF.md       change.md         data        paper          runs                    server_tree.txt
+
+./Edge_AI_hematology-main:
+README.md    dataset.py           losses.py              outputs        paper_results              requirements.txt         stain_normalize_inference.py  weights
+__pycache__  eval_generalized.py  metrics_evaluation.py  paper          prepare_clinical_split.py  retrain_and_evaluate.py  test_pipeline.py              yolov8n.pt
+data         generate_report.py   models                 paper_eval.py  quantize_and_infer.py      runs                     train.py
+
+./Edge_AI_hematology-main/__pycache__:
+dataset.cpython-312.pyc           losses.cpython-312.pyc                  quantize_and_infer.cpython-312.pyc         train.cpython-313.pyc
+eval_generalized.cpython-313.pyc  metrics_evaluation.cpython-312.pyc      retrain_and_evaluate.cpython-313.pyc
+generate_report.cpython-312.pyc   prepare_clinical_split.cpython-313.pyc  stain_normalize_inference.cpython-313.pyc
+
+./Edge_AI_hematology-main/data:
+clinical_72
+
+./Edge_AI_hematology-main/data/clinical_72:
+
+./Edge_AI_hematology-main/models:
+__init__.py  __pycache__  picodet_model.py  ssdlite_mobilenetv3.py  yolov8_model.py
+
+./Edge_AI_hematology-main/models/__pycache__:
+__init__.cpython-312.pyc  picodet_model.cpython-312.pyc  ssdlite_mobilenetv3.cpython-312.pyc  yolov8_model.cpython-312.pyc  yolov8_model.cpython-313.pyc
+
+./Edge_AI_hematology-main/outputs:
+Clinical_Triage_Report.pdf  checkpoints  clinical_results  generalized  test_run  yolov8n_int8.onnx
+
+./Edge_AI_hematology-main/outputs/checkpoints:
+ssdlite_mobilenetv3_best.pth  ssdlite_mobilenetv3_hematology
+
+./Edge_AI_hematology-main/outputs/checkpoints/ssdlite_mobilenetv3_hematology:
+results.csv  results.png  val_batch0_labels.jpg  val_batch0_pred.jpg  weights
+
+./Edge_AI_hematology-main/outputs/checkpoints/ssdlite_mobilenetv3_hematology/weights:
+best.pt  last.pt
+
+./Edge_AI_hematology-main/outputs/clinical_results:
+SSDLite_Clinical72_Platelets_bland_altman.png  SSDLite_Clinical72_evaluation_report.json      YOLOv8n_Clinical72_WBC_bland_altman.png
+SSDLite_Clinical72_RBC_bland_altman.png        YOLOv8n_Clinical72_Platelets_bland_altman.png  YOLOv8n_Clinical72_evaluation_report.json
+SSDLite_Clinical72_WBC_bland_altman.png        YOLOv8n_Clinical72_RBC_bland_altman.png
+
+./Edge_AI_hematology-main/outputs/generalized:
+checkpoints  clinical_split  onnx  paper_results  results
+
+./Edge_AI_hematology-main/outputs/generalized/checkpoints:
+
+./Edge_AI_hematology-main/outputs/generalized/clinical_split:
+
+./Edge_AI_hematology-main/outputs/generalized/onnx:
+
+./Edge_AI_hematology-main/outputs/generalized/paper_results:
+
+./Edge_AI_hematology-main/outputs/generalized/results:
+
+./Edge_AI_hematology-main/outputs/test_run:
+Sample_Diagnostic_Report.pdf             Test_YOLOv8n_RBC_bland_altman.png  Test_YOLOv8n_evaluation_report.json  sample_smear.jpg
+Test_YOLOv8n_Platelets_bland_altman.png  Test_YOLOv8n_WBC_bland_altman.png  annotated_smear.jpg
+
+./Edge_AI_hematology-main/paper:
+README.md  main.tex  make_paper_figs.py  references.bib  refs.bib
+
+./Edge_AI_hematology-main/paper_results:
+fig_ba_BCCD.pdf            fig_cost_vs_icc.pdf  fig_pb_BCCD.pdf                 fig_quantisation.pdf         paper_numbers.tex    table_cv.tex
+fig_ba_annotated_BCCD.pdf  fig_icc_bar.pdf      fig_pr_summary.pdf              fig_reliability.pdf          results.json         table_detection.tex
+fig_confusion_BCCD.pdf     fig_mAP_compare.pdf  fig_qualitative_detections.pdf  fig_system_architecture.pdf  table_agreement.tex
+
+./Edge_AI_hematology-main/runs:
+detect
+
+./Edge_AI_hematology-main/runs/detect:
+outputs
+
+./Edge_AI_hematology-main/runs/detect/outputs:
+checkpoints
+
+./Edge_AI_hematology-main/runs/detect/outputs/checkpoints:
+yolov8n_hematology
+
+./Edge_AI_hematology-main/runs/detect/outputs/checkpoints/yolov8n_hematology:
+BoxF1_curve.png  BoxR_curve.png        confusion_matrix_normalized.png  results.png       train_batch2.jpg       val_batch1_labels.jpg
+BoxPR_curve.png  args.yaml             labels.jpg                       train_batch0.jpg  val_batch0_labels.jpg  val_batch1_pred.jpg
+BoxP_curve.png   confusion_matrix.png  results.csv                      train_batch1.jpg  val_batch0_pred.jpg    weights
+
+./Edge_AI_hematology-main/runs/detect/outputs/checkpoints/yolov8n_hematology/weights:
+best.onnx  best.pt  last.pt
+
+./Edge_AI_hematology-main/weights:
+yolo26n.pt
+
+./critiques:
+critique-2.md  critique.md  round-1  round-2
+
+./critiques/round-1:
+critique-2.md  critique.md
+
+./critiques/round-2:
+critique-2.md  critique.md
+
+./data:
+BCCD_r  clinical_72
+
+./data/BCCD_r:
+BCCD  LICENSE  README.md  dataset  example.jpg  export.py  plot.py  scripts  test.csv
+
+./data/BCCD_r/BCCD:
+Annotations  ImageSets  JPEGImages  yolo_format
+
+./data/BCCD_r/BCCD/Annotations:
+[364 .xml files]
+
+./data/BCCD_r/BCCD/ImageSets/Main:
+test.txt  train.txt  trainval.txt  val.txt
+
+./data/BCCD_r/BCCD/JPEGImages:
+[364 .jpg files]
+
+./data/BCCD_r/BCCD/yolo_format:
+data.yaml  images  labels
+
+./data/BCCD_r/BCCD/yolo_format/images:
+train  val
+
+./data/BCCD_r/BCCD/yolo_format/labels:
+train  train.cache  val  val.cache
+
+./data/clinical_72:
+annotations  images
+
+./data/clinical_72/annotations:
+[72 .xml files]
+
+./data/clinical_72/images:
+[364 .jpeg files]
+
+./improvements:
+IMPROVEMENT_LOG.md  PROJECT_MAP.md  changelog-1.md  changelog-2.md  reading-list.md
+
+./paper:
+figures  main.tex  make_paper_figs.py  paper.aux  paper.bbl  paper.blg  paper.log  paper.out  paper.pdf  paper.tex  references.bib  refs.bib
+
+./paper/figures:
+fig_ba_BCCD.pdf            fig_confusion_BCCD.pdf  fig_icc_bar.pdf      fig_pb_BCCD.pdf     fig_qualitative_detections.pdf  fig_reliability.pdf
+fig_ba_annotated_BCCD.pdf  fig_cost_vs_icc.pdf     fig_mAP_compare.pdf  fig_pr_summary.pdf  fig_quantisation.pdf            fig_system_architecture.pdf
+
+./server:
+comparison_docx_extracted.txt  project_tree.tsv
