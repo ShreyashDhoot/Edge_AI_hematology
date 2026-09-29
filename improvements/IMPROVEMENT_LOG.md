@@ -71,3 +71,15 @@
 | R3-C04 | FATAL | Crit. 2 §2.1 | Risk of clinical fine-tuning leakage across full 72 images | RISK | Flagged / Script Guarded | Audited evaluation script CLI; documented strict path isolation protocol in `SERVER_TASKS.md` (T-G06). |
 | R3-C05 | FATAL | Crit. 1 §1, Crit. 2 §1.1 | Table V contains unexecuted placeholder markers `[[PENDING: T-G06]]` | SERVER | Awaiting server results | Preserved baseline rows intact; logged Task T-G06 to ingest empirical outputs once server finishes. |
 
+---
+
+## Issue Registry (Round 4 — Final Sign-Off)
+
+| ID | Severity | Critique Source | Category / Issue | Label | Status | What Changed / What's Pending |
+|---|---|---|---|---|---|---|
+| R4-C01 | FATAL | Dr. Deshpande §1 | Author block is anonymized / redacted | FIX | Done | Populated official author block with all four student authors and Dr. Anagha Deshpande (DOEEE, MIT-WPU). |
+| R4-C02 | MAJOR | Dr. Deshpande §1 | Acknowledgment omits project guide | FIX | Done | Updated `\section*{Acknowledgment}` honoring Dr. Anagha Deshpande for research supervision and mentorship. |
+| R4-C03 | FATAL | Dr. Deshpande §2 | Table V contains unexecuted placeholder markers | FIX | Done | Ingested verified server results from `server/results/T-G06/generalized_results.json` into Table V. |
+| R4-C04 | MAJOR | Dr. Deshpande §3 | Discussion of ablation results missing physical explanation | FIX | Done | Rewrote Section IV-H in student voice explaining chromatin contrast, RBC gain under MixUp/rotation, and the interaction between Reinhard color transfer and $\tau_{\text{PLT}}=0.15$. |
+| R4-C05 | FATAL | Dr. Deshpande §4 | 9-page spillover risk | FIX | Done | Tightened Sections IV-H, V-A, V-B, V-C using `paper-writing` concision rules; compiled cleanly to exactly 8.0 pages (0 overfull hboxes). |
+

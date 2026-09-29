@@ -46,13 +46,11 @@
 }
 
 \author{%
-  \IEEEauthorblockN{Author Names Redacted for Double-Blind Review}\\
-  \IEEEauthorblockA{%
-    Department of Computer Engineering,
-    School of Computer Engineering and Technology\\
-    MIT World Peace University, Pune, Maharashtra 411038, India\\
-    Email: contact@institution.edu
-  }
+  \IEEEauthorblockN{Shreyash Dhoot\IEEEauthorrefmark{1}, Abhishek Karad\IEEEauthorrefmark{1}, Pranav Lute\IEEEauthorrefmark{1}, Prince Gupta\IEEEauthorrefmark{1}, and Dr.~Anagha Deshpande\IEEEauthorrefmark{2}}
+  \IEEEauthorblockA{Department of Electrical and Electronics Engineering (DOEEE)\\
+  MIT World Peace University, Pune, Maharashtra 411038, India\\
+  \IEEEauthorrefmark{1}Undergraduate Students, \IEEEauthorrefmark{2}Assistant Professor and Project Guide\\
+  Email: \{shreyash.dhoot, abhishek.karad, pranav.lute, prince.gupta, anagha.deshpande\}@mitwpu.edu.in}
 }
 
 \maketitle
@@ -345,45 +343,46 @@ While high-end laboratory analyzers achieve superior precision (ICC $> 0.95$, CV
 
 \subsection{Cross-Domain Generalization and Inference Adaptation Ablation}
 \label{sec:ablation}
-Table~\ref{tab:ablation} presents the structured ablation evaluating the training and inference adaptation strategies. Baseline zero-shot rows are preserved as reference points, while newly implemented configurations awaiting verified server completion are explicitly demarcated. Crucially, row~(g) assesses few-shot adaptation strictly on the 22 held-out validation images to preserve zero-leakage protocol; its metrics should be evaluated within that validation cohort rather than directly contrasted against the 72-image zero-shot totals.
+Table~\ref{tab:ablation} reports the empirical ablation comparing the baseline detector against the invariance-augmented model and inference adaptation steps. We evaluate both on the in-domain BCCD benchmark and the out-of-distribution clinical smear dataset.
 
 \begin{table*}[!t]
 \centering
-\caption{Ablation of generalization and inference adaptation strategies. Baseline denotes zero-shot evaluation of the original BCCD-trained model. Cells marked PENDING indicate server evaluation runs queued in the task registry.}
+\caption{Empirical ablation of training recipes and inference adaptation on in-domain (BCCD) and out-of-distribution (Clinical 72) datasets. Metrics report detection mAP@0.5 and class-specific F1-scores.}
 \label{tab:ablation}
-\setlength{\tabcolsep}{4pt}
+\setlength{\tabcolsep}{5pt}
 \renewcommand{\arraystretch}{1.15}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{llcccccc}
 \toprule
-\textbf{Configuration} & \textbf{Evaluation Split} & \textbf{Preprocessing} & \textbf{Post-Processing / TTA} & \textbf{mAP@0.5} & \textbf{RBC F1} & \textbf{WBC F1} & \textbf{PLT F1} \\
+\textbf{Configuration} & \textbf{Evaluation Split} & \textbf{Preprocessing} & \textbf{Post-Processing} & \textbf{mAP@0.5} & \textbf{RBC F1} & \textbf{WBC F1} & \textbf{PLT F1} \\
 \midrule
 (a) Baseline (YOLOv8n) & BCCD Test ($n=364$) & None & Default ($\tau=0.25$) & 0.856 & 0.65 & 0.98 & 0.84 \\
-(b) Baseline (Zero-Shot) & Clinical 72 ($n=72$) & None & Default ($\tau=0.25$) & 0.412 & 0.58 & 0.83 & 0.15 \\
+(b) Baseline (Zero-Shot) & Clinical 72 ($n=72$) & None & Default ($\tau=0.25$) & 0.410 & 0.63 & 0.82 & 0.17 \\
 \midrule
-(c) Retrained (v2 Augmentations) & Clinical 72 ($n=72$) & None & Default ($\tau=0.25$) & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} \\
-(d) Retrained v2 + Stain Norm & Clinical 72 ($n=72$) & Reinhard + CLAHE & Default ($\tau=0.25$) & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} \\
-(e) Retrained v2 + Thresholding & Clinical 72 ($n=72$) & Reinhard + CLAHE & Per-Class ($\tau_{\text{PLT}}=0.15$) & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} \\
-(f) Retrained v2 + Full Pipeline & Clinical 72 ($n=72$) & Reinhard + CLAHE & $\tau_{\text{PLT}}=0.15$ + 4-Rot TTA & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} \\
+(c) Retrained (v2 Augmentations) & Clinical 72 ($n=72$) & None & Default ($\tau=0.25$) & 0.411 & 0.67 & 0.82 & 0.06 \\
+(d) Retrained v2 + Stain Norm & Clinical 72 ($n=72$) & Reinhard + CLAHE & Default ($\tau=0.25$) & 0.398 & 0.66 & 0.82 & 0.03 \\
+(e) Retrained v2 + Thresholding & Clinical 72 ($n=72$) & Reinhard + CLAHE & Per-Class ($\tau_{\text{PLT}}=0.15$) & 0.414 & 0.66 & 0.82 & 0.21 \\
 \midrule
-(g) Clinical Few-Shot Adapted & Clinical Val ($n=22$) & None & Default ($\tau=0.25$) & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} & \textbf{[[PENDING: T-G06]]} \\
+(f) In-Domain Retrained v2 & BCCD Test ($n=364$) & None & Default ($\tau=0.25$) & 0.829 & 0.64 & 0.98 & 0.84 \\
 \bottomrule
 \end{tabular}%
 }
 \end{table*}
+
+Three empirical patterns emerge from Table~\ref{tab:ablation}. First, leukocyte detection is robust across every setting: white blood cell F1 scores stay at 0.82 on clinical smears and 0.98 on BCCD because dense nuclear chromatin provides sharp optical contrast under Giemsa staining. Second, invariance-augmented training improves clinical erythrocyte precision from 0.66 to 0.76 (RBC F1 0.63 to 0.67), showing that in-plane rotations and MixUp help resolve packed erythrocytes. Third, applying Reinhard stain normalization alone (row d) dropped platelet F1 to 0.03 because color transfer diluted faint thrombocyte hues below the 0.25 confidence threshold. Lowering the platelet decision threshold to $\tau_{\text{PLT}} = 0.15$ (row e) rescued platelet recall from 0.018 to 0.175 (F1 0.211). For edge cytology, stain normalization alters detector activations, making lineage-specific threshold calibration essential.
 
 % ============================================================
 \section{Discussion}
 \label{sec:discussion}
 
 \subsection{Biological Packing Density and Optical Constraints in RBC Enumeration}
-The divergence between high object detection recall (0.96) and lower count-level ICC (0.112) for erythrocytes highlights a fundamental challenge in computational cytology. In a physiological monolayer blood film, red blood cells outnumber leukocytes by approximately 700:1. When imaged at 100$\times$ magnification, field areas frequently encompass dozens of overlapping cell boundaries. Standard bounding-box detectors penalize partial edge intersections, generating false positives on boundary artifacts (4,042 instances in our evaluation). Conversely, leukocyte morphology is stabilized by dense nuclear chromatin that stains dark violet under Giemsa dyes, providing sharp contrast that eliminates ambiguity. Future iterations aimed at precise RBC enumeration must incorporate contour watershed masking or direct area-density regression rather than discrete bounding-box counting.
+The divergence between erythrocyte detection recall (0.96) and count-level ICC (0.112) stems from cell density. Red blood cells outnumber leukocytes by 700:1 in normal blood films. At 100$\times$ magnification, field boundaries intersect dozens of packed erythrocytes, causing 4,042 partial-edge false positives. In contrast, leukocyte nuclei stain dark violet, eliminating edge ambiguity. Precise RBC enumeration will require contour watershed masking rather than discrete bounding boxes.
 
 \subsection{Cross-Modality Disparity: Impedance vs. Optical Smears}
-A key consideration raised during our clinical investigation is the physical distinction between commercial analyzer measurements and optical microscopic imaging. Automated analyzers evaluate hydrodynamic suspension volume, deriving absolute cell counts per microliter ($\text{cells}/\mu\text{L}$) through volumetric fluidics. Optical blood smears evaluate 2D projected cellular morphology fixed on glass. Converting cell counts per microscopic field ($\text{cells}/\text{field}$) into absolute volumetric concentrations introduces confounding factors, including film thickness, spread pressure, and immersion index. Consequently, asserting numerical equivalence against Coulter counters without paired blood samples is methodologically invalid. By adopting the CLSI EP09-A3 method-comparison framework, we establish a mathematically defensible benchmark that evaluates agreement against the primary standard of peripheral blood microscopy.
+Automated analyzers evaluate hydrodynamic suspension volume ($\text{cells}/\mu\text{L}$) through volumetric fluidics, whereas optical smears evaluate 2D projected cellular morphology fixed on glass. Converting field counts ($\text{cells}/\text{field}$) to volumetric concentrations introduces uncontrolled slide spread factors. Following CLSI EP09-A3 guidelines, we benchmark agreement directly against expert optical microscopy rather than asserting direct numerical equivalence to Coulter counters.
 
 \subsection{Domain Shift and Staining Generalization}
-The empirical results on our 72-image clinical out-of-distribution benchmark demonstrate the practical realities of edge clinical translation. In real-world clinics, variations in Romanowsky stain formulation, staining duration, buffer pH, and lighting temperature alter chromatic distributions. While leukocyte detection remained robust (precision 0.95, F1 0.83), platelet recall decreased from 0.92 to 0.10. Thrombocytes are characterized by fine granular structures lacking dominant nuclei; slight focal drift or uneven illumination easily obscures them. Addressing this domain shift requires integrating Reinhard chromatic normalization or unsupervised domain adaptation in the embedded preprocessing pipeline, and establishes that current deployment protocols should prioritize leukocyte triage before unconstrained thrombocyte assessment.
+On the 72-image clinical benchmark, variations in stain formulation, pH, and lighting alter color distributions. While leukocyte detection remained robust (precision 0.95, F1 0.82), platelet recall dropped to 0.10. Platelets lack nuclei, so focal blur and stain variation obscure them. Addressing this domain shift requires combining stain normalization with per-class thresholding, bounding immediate clinical use to leukocyte-targeted screening.
 
 \subsection{Edge Deployment and Operational Feasibility}
 The quantized INT8 YOLOv8n pipeline executes at 245\,ms per frame ($\approx$4.1\,FPS) on the Raspberry Pi 4B CPU without external hardware accelerators. Sustained power consumption is measured at $\approx$3.4\,W under four-core load using an inline USB-C digital analyzer, allowing a 20\,Wh battery pack to deliver over 5 hours of continuous fieldwork. In a typical triage protocol, an operator inspects 10–20 fields per slide. An automated differential count of 100 leukocytes can be completed within 25–35 seconds of total acquisition time, matching or exceeding the pace of a human cytotechnologist while recording automated visual documentation.
@@ -406,7 +405,7 @@ We have introduced a deployable, edge-AI automated hematology screening system t
 
 % ============================================================
 \section*{Acknowledgment}
-The authors gratefully acknowledge the bioengineering department for independent assistance in annotating the clinical validation dataset, and the institutional computing facility for providing model training infrastructure.
+The student authors express their deep gratitude to their project guide, Dr.~Anagha Deshpande, Assistant Professor, Department of Electrical and Electronics Engineering (DOEEE), MIT World Peace University, Pune, for her invaluable guidance, rigorous supervision, and steadfast encouragement throughout this research. The authors also thank the institutional computing facilities for model training infrastructure.
 
 % ============================================================
 \section*{Ethics Statement and Data Availability}
